@@ -32,6 +32,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Start-Fairy.ps1
 
 ## 功能
 
+- 隐藏首页原生装饰 logo，避免从 Fairy 眼睛后方露出；按钮和输入区图标保留。
 - Fairy 头像与动态独眼：指针跟随、眨眼、处理状态轨道；支持关闭动画与低功耗模式。
 - 日夜主题：H.D.D 设置和旁边的快捷按钮均可切换，偏好保存在本机。
 - 聊天布局：上方独眼、独立消息区、加长输入框；底栏控件居中排列，文字左对齐。
@@ -40,7 +41,11 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Start-Fairy.ps1
 - 用量卡片：现金余额未接入时显示「—」；今日电量显示本机 Token 增量；剩余用量直接列出 5 小时与 1 周剩余百分比、重置时间和更新时间，无需悬停。
 - 窄窗口自动收回装饰和底栏布局；支持系统减少动态效果设置。
 
-用量每分钟刷新，仅解析本机 Codex 会话日志的 `token_count` 元数据。今日电量按北京时间自然日累计，包含缓存输入；账户剩余额度取日志中最新 Codex 额度记录，重置后等待新记录，不推测为 100%。本机记录不等同于完整账户账单。主题不读取密钥，也不保存聊天正文。
+剩余额度每分钟通过已安装 Codex CLI 的只读 `account/rateLimits/read` 接口主动查询，不依赖新聊天或日志追加。查询由 CLI 使用已有登录完成，主题不读取或输出凭据。界面标注「查询」时间；接口不可用时回退到本机 `token_count` 额度记录，并标注「记录」时间，过期数据等待更新，不推测为 100%。
+
+今日电量仍只解析本机会话日志的 Token 元数据，按北京时间自然日累计，包含缓存输入；本机记录不等同于完整账户账单。主题不保存聊天正文。
+
+账户查询接口参考 [OpenAI App Server 文档](https://developers.openai.com/codex/app-server)。
 
 ## 恢复原貌
 
@@ -56,7 +61,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Start-Fairy.ps1
 
 ## 排障与兼容
 
-已在 Windows 的 OpenAI.Codex 26.1007.2314.0 上验证。Codex 更新可能改变内部 DOM，适配位置在 `renderer.js` 和 `fairy.css`。主题仅在识别到 Codex 主界面时启用。
+已在 Windows 的 OpenAI.Codex 26.1007.2314.0 和 26.1007.9446.0 上验证。Codex 更新可能改变内部 DOM，适配位置在 `renderer.js` 和 `fairy.css`。主题仅在识别到 Codex 主界面时启用。
 
 - 未生效：正常退出 Codex 后再运行启动器，确认已切到 Codex 模式。
 - 启动报错：查看工具目录的 `fairy.log` 和 `fairy-error.log`。

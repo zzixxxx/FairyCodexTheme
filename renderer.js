@@ -15,7 +15,7 @@
   overlay.innerHTML = `<div class="fairy-stage" aria-hidden="true"><div class="fairy-orbit"></div>${eye}</div><div class="fairy-caption" aria-hidden="true"><small>HOLLOW DEEP DIVE SYSTEM</small><h1>你好，绳匠。</h1><p>Fairy 已接入。随时可以开始委托。</p><span class="fairy-state">FAIRY // STANDBY</span></div><button class="fairy-control" type="button" aria-label="Fairy 外观设置" aria-expanded="false" aria-controls="fairy-codex-settings">◉ FAIRY · HDD</button><section id="fairy-codex-settings" class="fairy-settings" aria-label="Fairy 外观设置" hidden><strong>FAIRY / VISUAL</strong><label><input type="checkbox" data-option="motion" checked> 动态眼睛与轨道</label><label><input type="checkbox" data-option="eye" checked> 显示 Fairy</label><label><input type="checkbox" data-option="power"> 低功耗模式</label><p class="fairy-live-status" aria-live="polite">HDD 待机</p><button type="button" data-action="restore">恢复 Codex 原貌</button></section>`;
   overlay.insertAdjacentHTML('beforeend',`<button class="fairy-workspace" type="button" aria-expanded="false" aria-controls="fairy-workspace-menu" data-action="workspace"><span>选择工作区</span><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10.2954 6.54537C10.5003 6.3404 10.8325 6.34051 11.0376 6.54537C11.2426 6.7504 11.2426 7.08253 11.0376 7.28756L8.60689 9.71822C8.27169 10.0534 7.72823 10.0534 7.39303 9.71822L4.96236 7.28756C4.75734 7.08253 4.75734 6.7504 4.96236 6.54537C5.16739 6.34035 5.49952 6.34035 5.70455 6.54537L7.99947 8.84029L10.2954 6.54537Z" fill="currentColor"/></svg></button><section class="fairy-workspace-menu" id="fairy-workspace-menu" aria-label="选择工作区" hidden><strong>选择工作区</strong><p>打开项目工作区，不更改当前聊天目录。</p><div class="fairy-project-list"></div><button type="button" data-action="add-project">＋ 添加工作区…</button></section>`);
   overlay.querySelector('.fairy-settings strong').insertAdjacentHTML('afterend',`<label>外观<select aria-label="外观模式" data-option="theme"><option value="dark">深潜夜间</option><option value="light">日间模式</option></select></label>`);
-  overlay.querySelector('.fairy-live-status').insertAdjacentHTML('afterend',`<p class="fairy-usage-note">今日电量为本机 Token 记录，每分钟刷新；剩余用量显示账户额度及重置时间；现金余额未接入。</p><button type="button" data-action="workspace">选择工作区…</button>`);
+  overlay.querySelector('.fairy-live-status').insertAdjacentHTML('afterend',`<p class="fairy-usage-note">今日电量为本机 Token 记录，每分钟刷新；剩余用量显示账户额度及重置时间；现金余额未接入。额度优先通过 Codex 账户接口查询，失败时回退到本机记录。</p><button type="button" data-action="workspace">选择工作区…</button>`);
   const meter=document.createElement('section');meter.id='fairy-codex-meter';meter.setAttribute('aria-label','用量概览');
   meter.innerHTML=`<div class="fairy-meter-summary"><span>余额</span><b data-metric="cash">—</b><span>今日电量</span><b data-metric="tokens" title="本机 Token 记录，尚未读取">—</b></div><section class="fairy-quota" aria-label="剩余用量"><header><span>剩余用量</span><button type="button" data-action="power" aria-pressed="false">普通模式</button></header><div class="fairy-quota-row" data-quota-row="primary"><span>5 小时</span><b data-metric="quota-primary">—</b><time>等待更新</time></div><div class="fairy-quota-row" data-quota-row="secondary"><span>1 周</span><b data-metric="quota-secondary">—</b><time>等待更新</time></div><p class="fairy-quota-updated">等待账户额度记录</p></section>`;
   document.head.append(style,widthStyle,dockStyle); document.body.append(overlay);
@@ -64,7 +64,7 @@
   }
   function rendered(node) {
     // Native modal menus mark the still-visible app aria-hidden; keep its geometry stable.
-    return node && !node.closest('[hidden]') && node.getBoundingClientRect().width > 0 && node.getBoundingClientRect().height > 0 && (getComputedStyle(node).visibility !== 'hidden' || node.hasAttribute('data-fairy-home-copy'));
+    return node && !node.closest('[hidden]') && node.getBoundingClientRect().width > 0 && node.getBoundingClientRect().height > 0 && (getComputedStyle(node).visibility !== 'hidden' || node.hasAttribute('data-fairy-home-copy') || node.hasAttribute('data-fairy-home-logo'));
   }
   function isCodex() {
     if (options.preview) return true;
@@ -106,7 +106,7 @@
         reset.textContent=`重置 ${sameDay?'':date+' '}${time(d)}`;reset.dateTime=d.toISOString();
       }else {reset.textContent=valid?'重置时间未知':'等待更新';reset.removeAttribute('datetime');}
     }
-    meter.querySelector('.fairy-quota-updated').textContent=quota?`更新 ${time(quota.observedAt)} · 北京时间`:'等待账户额度记录';
+    meter.querySelector('.fairy-quota-updated').textContent=quota?`${quota.source==='codex-account-api'?'查询':'记录'} ${time(quota.observedAt)} · 北京时间`:'等待账户额度记录';
     const node=meter.querySelector('[data-metric="tokens"]');
     if(data?.available&&Number.isFinite(data.total)&&data.total>=0) {
       const value=data.total>=1e6?`${(data.total/1e6).toFixed(2)}M`:data.total>=1000?`${(data.total/1000).toFixed(1)}k`:String(data.total);
@@ -167,13 +167,20 @@
     const composerRect = dockControls(composer,composer?.getBoundingClientRect(),bounds);
     // Use message anchors rather than full text reads. Never inspect chat contents.
     const hasMessages = [...main.querySelectorAll('.thread-scroll-container,article,[data-message-author-role], [data-testid*="conversation-turn"], [data-turn-id], [data-fairy-preview-message]')].some(rendered);
-    const homeSignals = [...main.querySelectorAll('[data-feature="game-source"],.group\\/home-suggestions')].some(rendered);
+    const homeSignals = [...main.querySelectorAll('[data-feature="game-source"],[class~="group/home-suggestions"]')].some(rendered);
     const homeRoute = homeSignals || /^(?:\/|\/threads\/new|\/thread\/new|\/new|\/index.html)$/.test(location.pathname) || options.preview;
     const task = hasMessages || !homeRoute;
     for(const node of main.querySelectorAll('[data-fairy-home-copy]')) {
       if(task) {const attrs=marked.get(node);const old=attrs?.get('data-fairy-home-copy');old==null?node.removeAttribute('data-fairy-home-copy'):node.setAttribute('data-fairy-home-copy',old);attrs?.delete('data-fairy-home-copy');}
     }
     if(!task) for(const node of main.querySelectorAll('h1,[data-feature="game-source"]')) mark(node,'data-fairy-home-copy');
+    // Hide only standalone decorative home icons, preserving all native control icons.
+    for(const node of marked.keys())if(node.hasAttribute('data-fairy-home-logo')&&(task||!main.contains(node)))unmark(node,'data-fairy-home-logo');
+    if(!task)for(const svg of main.querySelectorAll('svg')) {
+      if(svg.closest('button,a,form,nav,header,[role="button"],[role="menu"],[data-fairy-composer],[class~="group/home-suggestions"]'))continue;
+      const r=svg.getBoundingClientRect();
+      if(r.width>=24&&r.width<=160&&r.height>=24&&r.height<=160&&r.top>=bounds.top+40&&r.bottom<(composerRect?.top||bounds.bottom))mark(svg,'data-fairy-home-logo');
+    }
     overlay.dataset.layout = task ? 'task' : 'home';
     const x = composerRect?.width ? composerRect.left + composerRect.width/2 : bounds.left + bounds.width / 2;
     const available = Math.min(bounds.bottom, composerRect?.top || bounds.bottom - 100) - bounds.top;

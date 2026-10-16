@@ -307,3 +307,5 @@ html[data-fairy-codex] #fairy-codex-meter .fairy-quota-row b {text-align:right}
 html[data-fairy-codex] #fairy-codex-meter .fairy-quota-row time {font-size:12px;white-space:nowrap;color:var(--fairy-muted);text-align:right;font-variant-numeric:tabular-nums}
 html[data-fairy-codex] #fairy-codex-meter .fairy-quota-updated {font-size:11px;line-height:1.5;margin:6px 0 0;color:var(--fairy-muted)}
 html[data-fairy-codex][data-fairy-theme="light"] #fairy-codex-meter .fairy-quota {border-color:#e1e3e8}
+/* Keep the original home emblem from showing behind Fairy. */
+html[data-fairy-codex] [data-fairy-home-logo] {visibility:hidden!important;pointer-events:none!important}

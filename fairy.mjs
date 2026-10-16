@@ -5,6 +5,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createRequire} from 'node:module';
 import {collectUsage} from './usage.mjs';
+import {collectAccountQuota} from './account-quota.mjs';
 const require = createRequire(import.meta.url);
 const dir = path.dirname(fileURLToPath(import.meta.url));
 const command = process.argv[2] || 'status';
@@ -13,8 +14,17 @@ const port = Number(portArg?.slice(7) || 9341);
 if(!Number.isInteger(port)||port<1024||port>65535) throw Error('Invalid port');
 const stopPath = path.join(dir,'.watch-stop');
 const sleep = ms => new Promise(r=>setTimeout(r,ms));
-let usageSnapshot=null,usageUpdated=0;
-async function usage() {if(!usageSnapshot||Date.now()-usageUpdated>60000){usageSnapshot=await collectUsage();usageUpdated=Date.now();}return usageSnapshot;}
+let usageSnapshot=null,usageUpdated=0,lastAccountQuota=null;
+async function usage() {
+  if(!usageSnapshot||Date.now()-usageUpdated>60000) {
+    const [local,account]=await Promise.all([collectUsage(),collectAccountQuota().catch(()=>null)]);
+    if(account)lastAccountQuota=account;
+    const fallback=local.quota;
+    const quota=account||(!fallback||lastAccountQuota?.observedAt>fallback.observedAt?lastAccountQuota:fallback);
+    usageSnapshot={...local,quota};usageUpdated=Date.now();
+  }
+  return usageSnapshot;
+}
 
 export function validateTarget(target, expectedPort) {
   const u = new URL(target.webSocketDebuggerUrl);
