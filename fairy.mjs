@@ -4,6 +4,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createRequire} from 'node:module';
+import {attachVoiceBridge} from './voice-host.mjs';
 import {collectUsage} from './usage.mjs';
 import {collectAccountQuota} from './account-quota.mjs';
 const require = createRequire(import.meta.url);
@@ -66,7 +67,8 @@ async function targets() {
 async function payload() {
   const [css, renderer] = await Promise.all(['fairy.css','renderer.js'].map(f=>fs.readFile(path.join(dir,f),'utf8')));
   const eye = require('./vendor/mascot-eye-svg.cjs');
-  return `(${renderer.trim()})(${JSON.stringify(css)},${JSON.stringify(eye)})`;
+  const [voice,speech]=await Promise.all(['voice.js','vendor/speech-text.js'].map(f=>fs.readFile(path.join(dir,f),'utf8')));
+  return `(()=>{const state=(${renderer.trim()})(${JSON.stringify(css)},${JSON.stringify(eye)});(${voice.trim()})(${speech.trim()});return state;})()`;
 }
 async function eachTarget(action) {
   const found=await targets();const results=[];
@@ -82,6 +84,12 @@ async function apply(force=false) {
     const result=await s.evaluate(expression);
     await s.evaluate(`window.__FAIRY_CODEX__?.setUsage?.(${JSON.stringify(metrics)})`);return result;
   });
+}
+const voiceSessions=new Map();
+async function connectVoices(){
+  const found=await targets();
+  for(const [id,value] of voiceSessions)if(!found.some(t=>t.id===id)||value.session.ws.readyState!==1){value.dispose();voiceSessions.delete(id);}
+  for(const t of found){if(voiceSessions.has(t.id))continue;let session;try{session=await new Session(t,port).open();if(!await session.evaluate('!!window.__FAIRY_CODEX__&&!window.__FAIRY_CODEX__.disabled')){session.close();continue;}const dispose=await attachVoiceBridge(session);voiceSessions.set(t.id,{session,dispose});}catch{session?.close();}}
 }
 async function main() {
   if(command==='status') {
@@ -99,10 +107,10 @@ async function main() {
     let last='', fail=0;
     const stop=()=>{process.exitCode=0;stopping=true;};let stopping=false;
     process.on('SIGINT',stop);process.on('SIGTERM',stop);
-    console.log(`Fairy visual watcher: loopback ${port}. No chat contents are read or logged.`);
+    console.log(`Fairy visual watcher: loopback ${port}. Speech reads reply text only when enabled; no contents are logged.`);
     while(!stopping) {
       try {await fs.access(stopPath);break;}catch{}
-      try {const result=await apply();fail=0;
+      try {const result=await apply();await connectVoices();fail=0;
         if(result.some(s=>s.disabled)) {
           await fs.writeFile(stopPath,'stop');
           await eachTarget(s=>s.evaluate('(()=>{window.__FAIRY_CODEX__?.dispose();return true})()'));
@@ -112,6 +120,7 @@ async function main() {
       catch {if(++fail===1)console.log('Waiting for Codex CDP...');if(fail>=30)break;}
       await sleep(2000);
     }
+    for(const value of voiceSessions.values())value.dispose();voiceSessions.clear();
     return;
   }
   throw Error('Usage: node fairy.mjs status|apply|watch|restore [--port=9341]');

@@ -9,3 +9,7 @@ Fairy, DSH, DeepSeek, Zenless Zone Zero, and related names or marks are not
 licensed by this NOTICE. See TRADEMARKS.md. Game text, official assets,
 private world data, user data, and personal corpora are intentionally not
 distributed by this repository.
+
+Adapted speech normalization and sentence splitting from
+fairy-voice/dsh-fairy-voice/lib/index.js into speech-text.js.
+Codex speech UI and Windows transport are new adapters.

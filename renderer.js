@@ -122,12 +122,19 @@
     }else {node.textContent='—';node.title='暂时无法读取本机 Token 记录';}
   }
   function dockControls(composer,box,bounds) {
-    const desiredWidth=bounds.width>=950?Math.max(400,bounds.width-230):null;
-    const widthCss=desiredWidth?`html[data-fairy-codex] [data-fairy-composer]{width:${desiredWidth}px!important;max-width:${desiredWidth}px!important;flex-shrink:0!important;margin-left:calc((100% - ${desiredWidth}px)/2 + 90px)!important;margin-right:calc((100% - ${desiredWidth}px)/2 - 90px)!important;}`:'';
+    const compact=bounds.width<500;
+    const reserve=bounds.width>=760?230:180;
+    const desiredWidth=bounds.width>=300?bounds.width-(compact?24:reserve):null;
+    const shift=compact?0:(reserve-50)/2;
+    const composerStyle=composer?getComputedStyle(composer):null;
+    const centeredAbsolute=composerStyle?.position==='absolute'&&composerStyle.transform!=='none';
+    const marginLeft=centeredAbsolute?shift+'px':`calc((100% - ${desiredWidth}px)/2 + ${shift}px)`;
+    const marginRight=centeredAbsolute?'0px':`calc((100% - ${desiredWidth}px)/2 - ${shift}px)`;
+    const widthCss=desiredWidth?`html[data-fairy-codex] [data-fairy-composer]{width:${desiredWidth}px!important;max-width:${desiredWidth}px!important;flex-shrink:0!important;margin-left:${marginLeft}!important;margin-right:${marginRight}!important;${compact?'padding-top:38px!important;':''}}`:'';
     if(widthStyle.textContent!==widthCss)widthStyle.textContent=widthCss;
     box=composer?.getBoundingClientRect();
     const room=box?box.left-bounds.left:0;
-    const enabled=box&&room>=146&&box.height<bounds.height*.6;
+    const enabled=box&&desiredWidth&&(compact||room>=120)&&box.height<bounds.height*.7;
     const consoleMode=enabled;
     for(const node of marked.keys())if(node.hasAttribute('data-fairy-console')&&(node!==composer||!consoleMode))unmark(node,'data-fairy-console');
     if(consoleMode)mark(composer,'data-fairy-console');
@@ -140,18 +147,20 @@
     }
     workspace.hidden=!enabled;
     if(!enabled){dockStyle.textContent='';lastDock='';return box;}
-    const width=Math.min(180,room-20),x=bounds.left+(room-width)/2,y=box.top+(box.height-102)/2;
+    const width=compact?(bounds.width-32)/3:Math.min(180,room-20);
+    const x=compact?bounds.left+12:bounds.left+(room-width)/2;
+    const y=compact?box.top+2:box.top+(box.height-102)/2;
     const uiFont=getComputedStyle(document.querySelector('aside [data-app-action-sidebar-project-label]')||document.body).fontSize;
     setStyle(overlay,'--fairy-ui-font',uiFont);
     setStyle(root,'--fairy-ui-font',uiFont);
     setStyle(overlay,'--fairy-console-top',box.top+'px');
     setStyle(overlay,'--fairy-dock-left',`${x}px`);setStyle(overlay,'--fairy-dock-top',`${y}px`);setStyle(overlay,'--fairy-dock-width',`${width}px`);
-    const signature=[x,y,width,bounds.left,bounds.right,box.left,box.right].join(':');
+    const signature=[compact,x,y,width,bounds.left,bounds.right,box.left,box.right].join(':');
     if(signature!==lastDock||model!==lastModel||permission!==lastPermission) {
       const selectors=['data-fairy-native-model','data-fairy-native-permission'];
       const base=selectors.map(a=>`html[data-fairy-codex] [${a}]{position:fixed!important;left:0!important;top:0!important;width:${width}px!important;height:34px!important;min-height:34px!important;max-height:34px!important;z-index:45!important;margin:0!important;}`).join('')+`html[data-fairy-codex] [data-fairy-console]::before{left:${bounds.left-box.left}px!important;right:${box.right-bounds.right}px!important;}`;
       dockStyle.textContent=base;
-      const offsets=[model,permission].map((n,i)=>n?(()=>{const r=n.getBoundingClientRect();return `html[data-fairy-codex] [${selectors[i]}]{left:${x-r.x}px!important;top:${y+34*(i+1)-r.y}px!important;}`;})():'');
+      const offsets=[model,permission].map((n,i)=>n?(()=>{const r=n.getBoundingClientRect();return `html[data-fairy-codex] [${selectors[i]}]{left:${x+(compact?(width+4)*(i+1):0)-r.x}px!important;top:${y+(compact?0:34*(i+1))-r.y}px!important;}`;})():'');
       dockStyle.textContent=base+offsets.join('');lastDock=signature;lastModel=model;lastPermission=permission;
     }
     return box;
@@ -308,7 +317,7 @@
     save();
   }
   function dispose() {
-    if(disposed) return; disposed = true; disabled = true;
+    if(disposed) return; window.__FAIRY_VOICE__?.dispose(); disposed = true; disabled = true;
     observer.disconnect();resize.disconnect();cancelAnimationFrame(timer);cancelAnimationFrame(raf);
     window.removeEventListener('resize',schedule);window.removeEventListener('popstate',schedule);
     document.removeEventListener('pointermove',onMove);document.removeEventListener('visibilitychange',onSleep);

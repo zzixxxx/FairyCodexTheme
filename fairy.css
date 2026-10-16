@@ -362,3 +362,42 @@ html[data-fairy-codex][data-fairy-theme="dark"] [data-fairy-main] [class*="_Code
   --codeblock-background-color:#172131!important;--codeblock-syntax-1:#efb278!important;--codeblock-syntax-2:#8cbbff!important;--codeblock-syntax-3:#9ad3ab!important;--codeblock-syntax-4:#e9a2d0!important;--codeblock-syntax-5:#c5acff!important;
   --color-codex-syntax-comment:#96a5b9!important;--color-codex-syntax-keyword:#e9a2d0!important;--color-codex-syntax-string:#9ad3ab!important;--color-codex-syntax-literal:#efb278!important;--color-codex-syntax-name:#8cbbff!important;--color-codex-syntax-variable:#c5acff!important;--color-codex-syntax-attribute:#e1c48a!important;
 }
+/* Preserve Windows' native caption buttons and give dark symbols a readable backing. */
+@media (prefers-color-scheme:light) {
+  html[data-fairy-codex][data-fairy-theme="dark"] [class*="_ApplicationMenuTopBar_"]::after {
+    content:"";position:absolute;right:0;top:0;pointer-events:none;
+    width:calc(100vw - env(titlebar-area-x,0px) - env(titlebar-area-width,calc(100vw - 138px)));
+    height:env(titlebar-area-height,36px);background:#cbd5e1;border-radius:0 0 0 8px;box-shadow:inset 0 -1px #72849b80;
+  }
+}
+/* Keep primary button text paired with its background, including review dialogs. */
+html[data-fairy-codex][data-fairy-theme="dark"],
+html[data-fairy-codex][data-fairy-theme="dark"] body,
+html[data-fairy-codex][data-fairy-theme="dark"] [data-fairy-main],
+html[data-fairy-codex][data-fairy-theme="dark"] aside.app-shell-left-panel,
+html[data-fairy-codex][data-fairy-theme="dark"] [role="dialog"] {
+  --color-text-primary-solid:#122037!important;--app-color-text-button-primary:#122037!important;
+}
+html[data-fairy-codex][data-fairy-theme="light"],
+html[data-fairy-codex][data-fairy-theme="light"] body,
+html[data-fairy-codex][data-fairy-theme="light"] [data-fairy-main],
+html[data-fairy-codex][data-fairy-theme="light"] aside.app-shell-left-panel,
+html[data-fairy-codex][data-fairy-theme="light"] [role="dialog"] {
+  --color-text-primary-solid:#fff!important;--app-color-text-button-primary:#fff!important;
+}
+#fairy-codex-overlay .fairy-workspace-menu {bottom:calc(100vh - var(--fairy-dock-top,calc(100vh - 120px)) + 8px)}
+
+/* Speech controls live inside H.D.D; removed hardware controls stay removed. */
+#fairy-codex-overlay .fairy-settings {max-height:calc(100vh - 130px);overflow-y:auto;width:min(350px,calc(100vw - 32px));}
+#fairy-codex-overlay .fairy-voice-panel {margin-top:14px;padding-top:12px;border-top:1px solid var(--fairy-border,#8292ac60);font-size:var(--fairy-ui-font,13px);}
+#fairy-codex-overlay .fairy-voice-panel label {display:flex;align-items:center;justify-content:space-between;gap:10px;margin:9px 0;}
+#fairy-codex-overlay .fairy-voice-panel select {max-width:200px;}
+#fairy-codex-overlay .fairy-voice-panel input:not([type=checkbox]):not([type=range]),#fairy-codex-overlay .fairy-voice-panel textarea {box-sizing:border-box;width:100%;min-width:0;background:#111b2b;color:#e8edf5;border:1px solid #7e90ac;border-radius:5px;padding:6px;font:inherit;}
+#fairy-codex-overlay .fairy-voice-panel details label {display:block;}
+#fairy-codex-overlay .fairy-voice-panel details p {line-height:1.6;}
+#fairy-codex-overlay .fairy-voice-actions {display:flex;flex-wrap:wrap;gap:6px;}
+#fairy-codex-overlay .fairy-voice-actions button {width:auto;margin:0;padding:6px 9px;}
+#fairy-codex-overlay .fairy-voice-actions button:disabled {opacity:.45;cursor:default;}
+#fairy-codex-overlay .fairy-voice-status {min-height:20px;line-height:1.5;}
+html[data-fairy-theme=light] #fairy-codex-overlay .fairy-voice-panel input:not([type=checkbox]):not([type=range]),html[data-fairy-theme=light] #fairy-codex-overlay .fairy-voice-panel textarea {background:#fff;color:#202123;border-color:#abb5c4;}
+#fairy-codex-overlay .fairy-settings {box-sizing:border-box;max-height:calc(var(--fairy-console-top,calc(100vh - 70px)) - 110px);}
