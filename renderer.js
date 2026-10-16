@@ -39,7 +39,7 @@
   function save() {try{localStorage.setItem('fairy-codex-visual-v1',JSON.stringify({motion,eye:showEye,power:lowPower,scale:eyeScale,speed,theme}));}catch{}}
   overlay.dataset.motion=motion?'on':'off';overlay.dataset.power=lowPower?'low':'normal';
   for(const [key,value] of Object.entries({motion,eye:showEye,power:lowPower})) overlay.querySelector(`[data-option="${key}"]`).checked=value;
-  overlay.style.setProperty('--fairy-eye-scale',String(eyeScale/100));overlay.style.setProperty('--fairy-orbit-duration',`${28*70/speed}s`);
+  setStyle(overlay,'--fairy-eye-scale',String(eyeScale/100));setStyle(overlay,'--fairy-orbit-duration',`${28*70/speed}s`);
   overlay.querySelector('[data-option="theme"]').value=theme;
   const workspace=overlay.querySelector('.fairy-workspace'),workspaceMenu=overlay.querySelector('.fairy-workspace-menu');
   const liveStatus = overlay.querySelector('.fairy-live-status');
@@ -60,27 +60,31 @@
     if(!attrs?.has(attr)) return;
     const old = attrs.get(attr);
     old === null ? node.removeAttribute(attr) : node.setAttribute(attr,old);
-    attrs.delete(attr);
+    attrs.delete(attr);if(!attrs.size)marked.delete(node);
   }
+  function setStyle(node,property,value) {if(node.style.getPropertyValue(property)!==value)node.style.setProperty(property,value);}
   function rendered(node) {
     // Native modal menus mark the still-visible app aria-hidden; keep its geometry stable.
-    return node && !node.closest('[hidden]') && node.getBoundingClientRect().width > 0 && node.getBoundingClientRect().height > 0 && (getComputedStyle(node).visibility !== 'hidden' || node.hasAttribute('data-fairy-home-copy') || node.hasAttribute('data-fairy-home-logo'));
+    if(!node||node.closest('[hidden]'))return false;
+    const rect=node.getBoundingClientRect();
+    return rect.width>0&&rect.height>0&&(getComputedStyle(node).visibility!=='hidden'||node.hasAttribute('data-fairy-home-copy')||node.hasAttribute('data-fairy-home-logo'));
   }
+  let modeNode=null;
   function isCodex() {
-    if (options.preview) return true;
-    if (!location.href.startsWith('app://')) return false;
-    const mode = [...document.querySelectorAll('button')].find(b => {
-      const r = b.getBoundingClientRect();
-      return r.width > 0 && r.height > 0 && r.left < 360 && r.top < 160 && /^(Codex|ChatGPT)$/i.test(b.textContent.trim());
-    });
-    if (mode) return /^Codex$/i.test(mode.textContent.trim());
-    return /^codex(?:\s|$)/i.test(document.title);
+    if(options.preview)return true;
+    if(!location.href.startsWith('app://'))return false;
+    const matches=node=>/^(Codex|ChatGPT)$/i.test(node.textContent.trim());
+    if(!modeNode?.isConnected||!matches(modeNode)||!rendered(modeNode)) {
+      modeNode=[...document.querySelectorAll('aside.app-shell-left-panel button')].find(node=>matches(node)&&rendered(node))||null;
+    }
+    return modeNode?/^Codex$/i.test(modeNode.textContent.trim()):/^codex(?:\s|$)/i.test(document.title);
   }
   function mainNode() { return [...document.querySelectorAll('main.main-surface,main[class*="_MainContentSurface_"],main')].find(rendered); }
-  let watchedMain = null;
+  let watchedMain=null,watchedComposer=null,watchedScroll=null,eyeRect=null,lastUsageSignature=null,missingSince=null;
   const resize = new ResizeObserver(() => schedule());
   let lastDock='',lastModel=null,lastPermission=null,projectTargets=[];
   function setTheme() {
+    if(overlay.dataset.theme===theme&&root.getAttribute('data-fairy-theme')===theme)return;
     overlay.dataset.theme=theme;
     const quick=overlay.querySelector('.fairy-day-toggle');
     quick.textContent=theme==='light'?'☾':'☀';quick.setAttribute('aria-label',theme==='light'?'切换到夜间模式':'切换到日间模式');quick.title=quick.getAttribute('aria-label');
@@ -88,10 +92,13 @@
     if(root.hasAttribute('data-fairy-codex')) {mark(root,'data-fairy-theme');if(root.getAttribute('data-fairy-theme')!==theme)root.setAttribute('data-fairy-theme',theme);}
   }
   function updateMeter() {
-    const button=meter.querySelector('button');button.textContent=lowPower?'低功耗模式':'普通模式';button.setAttribute('aria-pressed',String(lowPower));
+    const button=meter.querySelector('button'),text=lowPower?'低功耗模式':'普通模式';if(button.textContent!==text)button.textContent=text;if(button.getAttribute('aria-pressed')!==String(lowPower))button.setAttribute('aria-pressed',String(lowPower));
   }
   function setUsage(data) {
     const quota=data?.quota,now=Date.now();
+    const expired=key=>Boolean(quota?.[key]?.resetsAt&&quota[key].resetsAt*1000<=now);
+    const signature=JSON.stringify(data)+':'+expired('primary')+':'+expired('secondary');
+    if(signature===lastUsageSignature)return;lastUsageSignature=signature;
     const localDate=value=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Shanghai',year:'numeric',month:'2-digit',day:'2-digit'}).format(value);
     const time=value=>new Intl.DateTimeFormat('zh-CN',{timeZone:'Asia/Shanghai',hour:'2-digit',minute:'2-digit',hourCycle:'h23'}).format(value);
     for(const [key,fallback] of [['primary','5 小时'],['secondary','1 周']]) {
@@ -135,10 +142,10 @@
     if(!enabled){dockStyle.textContent='';lastDock='';return box;}
     const width=Math.min(180,room-20),x=bounds.left+(room-width)/2,y=box.top+(box.height-102)/2;
     const uiFont=getComputedStyle(document.querySelector('aside [data-app-action-sidebar-project-label]')||document.body).fontSize;
-    overlay.style.setProperty('--fairy-ui-font',uiFont);
-    root.style.setProperty('--fairy-ui-font',uiFont);
-    overlay.style.setProperty('--fairy-console-top',box.top+'px');
-    overlay.style.setProperty('--fairy-dock-left',`${x}px`);overlay.style.setProperty('--fairy-dock-top',`${y}px`);overlay.style.setProperty('--fairy-dock-width',`${width}px`);
+    setStyle(overlay,'--fairy-ui-font',uiFont);
+    setStyle(root,'--fairy-ui-font',uiFont);
+    setStyle(overlay,'--fairy-console-top',box.top+'px');
+    setStyle(overlay,'--fairy-dock-left',`${x}px`);setStyle(overlay,'--fairy-dock-top',`${y}px`);setStyle(overlay,'--fairy-dock-width',`${width}px`);
     const signature=[x,y,width,bounds.left,bounds.right,box.left,box.right].join(':');
     if(signature!==lastDock||model!==lastModel||permission!==lastPermission) {
       const selectors=['data-fairy-native-model','data-fairy-native-permission'];
@@ -151,10 +158,24 @@
   }
   function refresh() {
     if (disposed) return;
+    for(const [node,attrs] of marked)if(!node.isConnected) {
+      for(const [attr,value] of attrs)value===null?node.removeAttribute(attr):node.setAttribute(attr,value);
+      marked.delete(node);
+    }
     const main = mainNode();
+    for(const node of marked.keys())if(node.hasAttribute('data-fairy-main')&&node!==main)unmark(node,'data-fairy-main');
     const sidebar = document.querySelector('aside.app-shell-left-panel');
-    if (disabled || !isCodex() || !main || !sidebar) {
-      clearMarkers(); overlay.hidden = true;meter.remove();brand.remove(); return;
+    const codexMode=!disabled&&isCodex();
+    // React can leave a short gap between old and new route containers. Keep the
+    // existing skin mounted through that gap instead of flashing the native theme.
+    if(codexMode&&(!main||!sidebar)) {
+      missingSince??=performance.now();
+      if(performance.now()-missingSince<200){schedule();return;}
+    }else missingSince=null;
+    if(!codexMode||!main||!sidebar) {
+      resize.disconnect();watchedMain=null;watchedComposer=null;watchedScroll=null;
+      lastDock='';lastModel=null;lastPermission=null;
+      clearMarkers();overlay.hidden=true;meter.remove();brand.remove();return;
     }
     overlay.hidden = false;
     mark(root, 'data-fairy-codex'); mark(main, 'data-fairy-main');
@@ -162,16 +183,18 @@
     const composer = [...main.querySelectorAll('.composer-surface-chrome,[class*="_ComposerLayoutRoot_"]')].find(rendered);
     for(const node of marked.keys()) if(node.hasAttribute('data-fairy-composer') && node!==composer) unmark(node,'data-fairy-composer');
     if (composer) mark(composer, 'data-fairy-composer');
-    if (main !== watchedMain) { resize.disconnect(); resize.observe(main); if(composer) resize.observe(composer); watchedMain = main; }
+    if(main!==watchedMain||composer!==watchedComposer) {resize.disconnect();resize.observe(main);if(composer)resize.observe(composer);watchedMain=main;watchedComposer=composer;}
     const bounds = main.getBoundingClientRect();
     const composerRect = dockControls(composer,composer?.getBoundingClientRect(),bounds);
     // Use message anchors rather than full text reads. Never inspect chat contents.
-    const hasMessages = [...main.querySelectorAll('.thread-scroll-container,article,[data-message-author-role], [data-testid*="conversation-turn"], [data-turn-id], [data-fairy-preview-message]')].some(rendered);
+    const scroll=[...main.querySelectorAll('.thread-scroll-container')].find(rendered);
+    watchedScroll=scroll||null;
+    const hasMessages=!!scroll||[...main.querySelectorAll('article,[data-message-author-role],[data-testid*="conversation-turn"],[data-turn-id],[data-fairy-preview-message]')].some(rendered);
     const homeSignals = [...main.querySelectorAll('[data-feature="game-source"],[class~="group/home-suggestions"]')].some(rendered);
     const homeRoute = homeSignals || /^(?:\/|\/threads\/new|\/thread\/new|\/new|\/index.html)$/.test(location.pathname) || options.preview;
     const task = hasMessages || !homeRoute;
     for(const node of main.querySelectorAll('[data-fairy-home-copy]')) {
-      if(task) {const attrs=marked.get(node);const old=attrs?.get('data-fairy-home-copy');old==null?node.removeAttribute('data-fairy-home-copy'):node.setAttribute('data-fairy-home-copy',old);attrs?.delete('data-fairy-home-copy');}
+      if(task)unmark(node,'data-fairy-home-copy');
     }
     if(!task) for(const node of main.querySelectorAll('h1,[data-feature="game-source"]')) mark(node,'data-fairy-home-copy');
     // Hide only standalone decorative home icons, preserving all native control icons.
@@ -185,10 +208,10 @@
     const x = composerRect?.width ? composerRect.left + composerRect.width/2 : bounds.left + bounds.width / 2;
     const available = Math.min(bounds.bottom, composerRect?.top || bounds.bottom - 100) - bounds.top;
     const y = task ? bounds.top + (innerHeight<=700?130:178) : bounds.top + Math.max(90, available * .36);
-    overlay.style.setProperty('--fairy-x', `${x}px`); overlay.style.setProperty('--fairy-y', `${y}px`);
+    setStyle(overlay,'--fairy-x', `${x}px`); setStyle(overlay,'--fairy-y', `${y}px`);
     const visible = showEye && (task ? bounds.width >= 700 && bounds.height >= 520 : bounds.width >= 400 && available >= 300);
-    stage.hidden = !visible; caption.hidden = !visible || task;
-    const scroll = [...main.querySelectorAll('.thread-scroll-container')].find(rendered);
+    stage.hidden = !visible; caption.hidden = !visible || task;eyeRect=null;
+
     for(const node of marked.keys()) if(node.hasAttribute('data-fairy-thread-scroll') && (node!==scroll||!visible||!task)) unmark(node,'data-fairy-thread-scroll');
     for(const node of marked.keys()) if(node.hasAttribute('data-fairy-thread-layout') && (node!==scroll?.parentElement||!visible||!task)) unmark(node,'data-fairy-thread-layout');
     if(scroll && task && visible) {mark(scroll,'data-fairy-thread-scroll');mark(scroll.parentElement,'data-fairy-thread-layout');}
@@ -213,25 +236,39 @@
     if(liveStatus.textContent!==status) liveStatus.textContent=status;
   }
   function schedule() {
-    if (disposed || timer) return;
-    timer = setTimeout(() => { timer = 0; refresh(); }, 180);
+    if(disposed||timer)return;
+    timer=requestAnimationFrame(()=>{timer=0;refresh();});
   }
-  const observer = new MutationObserver(records => {
-    if (records.some(r => !overlay.contains(r.target) && !meter.contains(r.target) && r.target !== style &&
-      !(r.type === 'attributes' && r.attributeName?.startsWith('data-fairy-')))) schedule();
-  });
-  observer.observe(document.body, {subtree:true,childList:true,attributes:true,attributeFilter:['aria-label','data-testid','hidden','class','style']});
+  const structureSelector='main,.composer-surface-chrome,[class*="_ComposerLayoutRoot_"],.thread-scroll-container,[role="navigation"],[role="tree"],[data-app-action-sidebar-scroll],[data-codex-intelligence-trigger],[data-composer-navigation-target="reasoning"],[data-composer-navigation-target="permissions"],button[aria-label="更改权限"],[data-testid="stop-button"]';
+  function affectsLayout(record) {
+    const target=record.target.nodeType===1?record.target:record.target.parentElement;
+    if(!target||target.closest('#fairy-codex-overlay,#fairy-codex-meter,#fairy-codex-brand')||target===style||target===dockStyle||target===widthStyle)return false;
+    if(record.type==='attributes') {
+      if(record.attributeName==='hidden'||target.matches(structureSelector))return true;
+      if(record.attributeName==='aria-label'||record.attributeName==='data-testid')return target===modeNode||!!watchedComposer?.contains(target)||/Stop|停止/.test(target.getAttribute('aria-label')||'');
+      return target===watchedMain||target===watchedComposer||target===watchedScroll||target===watchedScroll?.parentElement||
+        !!(watchedMain&&target.contains(watchedMain))||!!(watchedComposer&&target.contains(watchedComposer))||target===modeNode;
+    }
+    if(target===modeNode||modeNode?.contains(target))return true;
+    if(target.closest('aside.app-shell-left-panel')&&target.matches('aside,[role="navigation"],[data-fairy-sidebar-header]'))return true;
+    if((watchedMain&&target.contains(watchedMain))||(watchedComposer&&target.contains(watchedComposer))||target===watchedScroll)return true;
+    for(const nodes of [record.addedNodes,record.removedNodes])for(const node of nodes)
+      if(node.nodeType===1&&(node.matches(structureSelector)||node.querySelector(structureSelector)))return true;
+    return false;
+  }
+  const observer=new MutationObserver(records=>{if(records.some(affectsLayout))schedule();});
+  observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:['aria-label','data-testid','hidden','class','style']});
   function onMove(event) {
     if (!motion || lowPower || matchMedia('(prefers-reduced-motion: reduce)').matches || document.hidden || overlay.hidden || stage.hidden || raf) return;
     const x = event.clientX, y = event.clientY;
     raf = requestAnimationFrame(() => {
       raf = 0;
-      const rect = stage.getBoundingClientRect();
+      const rect=eyeRect||(eyeRect=stage.getBoundingClientRect());
       stage.style.setProperty('--fairy-look-x', `${Math.max(-5, Math.min(5, (x-rect.left-rect.width/2)/70))}px`);
       stage.style.setProperty('--fairy-look-y', `${Math.max(-4, Math.min(4, (y-rect.top-rect.height/2)/90))}px`);
     });
   }
-  function onSleep() { if(document.hidden) mark(root,'data-fairy-sleep'); else root.removeAttribute('data-fairy-sleep'); }
+  function onSleep() {if(document.hidden)mark(root,'data-fairy-sleep');else {root.removeAttribute('data-fairy-sleep');schedule();}}
   function onKey(e) { if(e.key === 'Escape') {if(!workspaceMenu.hidden){workspaceMenu.hidden=true;workspace.setAttribute('aria-expanded','false');workspace.focus();}else if(!settings.hidden){settings.hidden = true;control.setAttribute('aria-expanded','false');control.focus();}} }
   function showWorkspaces() {
     const sidebar=document.querySelector('aside.app-shell-left-panel');
@@ -266,13 +303,13 @@
     save();
   }
   function onInput(e) {
-    if(e.target.dataset.option === 'scale') {eyeScale=clamp(Number(e.target.value),70,120,100);overlay.style.setProperty('--fairy-eye-scale',String(eyeScale/100));}
-    if(e.target.dataset.option === 'speed') {speed=clamp(Number(e.target.value),30,150,70);overlay.style.setProperty('--fairy-orbit-duration',`${28*70/speed}s`);}
+    if(e.target.dataset.option === 'scale') {eyeScale=clamp(Number(e.target.value),70,120,100);setStyle(overlay,'--fairy-eye-scale',String(eyeScale/100));}
+    if(e.target.dataset.option === 'speed') {speed=clamp(Number(e.target.value),30,150,70);setStyle(overlay,'--fairy-orbit-duration',`${28*70/speed}s`);}
     save();
   }
   function dispose() {
     if(disposed) return; disposed = true; disabled = true;
-    observer.disconnect();resize.disconnect();clearTimeout(timer);cancelAnimationFrame(raf);
+    observer.disconnect();resize.disconnect();cancelAnimationFrame(timer);cancelAnimationFrame(raf);
     window.removeEventListener('resize',schedule);window.removeEventListener('popstate',schedule);
     document.removeEventListener('pointermove',onMove);document.removeEventListener('visibilitychange',onSleep);
     document.removeEventListener('keydown',onKey);document.removeEventListener('pointerdown',onOutsidePointer,true);

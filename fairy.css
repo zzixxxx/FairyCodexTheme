@@ -120,7 +120,10 @@ html[data-fairy-codex][data-fairy-theme="light"] {
   --color-background:#edf2f6;--color-foreground:#23364b;--color-token-bg-primary:#edf2f6;--color-token-bg-secondary:#e0e7ee;--color-token-bg-tertiary:#d5dee8;
   --color-token-text-primary:#23364b;--color-token-text-secondary:#536b85;--color-token-border-default:#758da84d;--color-token-main-surface-primary:#edf2f6;--color-token-sidebar-surface-primary:#d8dfe5;
 }
-html[data-fairy-codex][data-fairy-theme="light"] * {
+html[data-fairy-codex][data-fairy-theme="light"],
+html[data-fairy-codex][data-fairy-theme="light"] body,
+html[data-fairy-codex][data-fairy-theme="light"] [data-fairy-main],
+html[data-fairy-codex][data-fairy-theme="light"] aside.app-shell-left-panel {
   --color-text-primary:#263c55!important;--color-text-primary-surface:#263c55!important;--color-text-primary-ghost-hover:#263c55!important;--color-text-primary-outline:#263c55!important;--color-text-primary-soft-alt:#263c55!important;
   --color-text-secondary:#5e7189!important;--color-text-secondary-solid:#5e7189!important;--color-text-secondary-ghost:#667a93!important;--color-text-secondary-outline:#667a93!important;--color-text-secondary-soft-alt:#506782!important;--color-text-tertiary:#76879c!important;
   --color-surface:#edf2f6!important;--color-surface-primary:#edf2f6!important;--color-surface-secondary:#e4ebf2!important;--color-surface-tertiary:#dae3ed!important;--color-surface-canvas:#edf2f6!important;
@@ -230,7 +233,10 @@ html[data-fairy-codex][data-fairy-theme="light"] {
   --color-background:#fff;--color-foreground:#202123;--color-token-bg-primary:#fff;--color-token-bg-secondary:#f7f7f8;--color-token-bg-tertiary:#ececef;
   --color-token-text-primary:#202123;--color-token-text-secondary:#60646c;--color-token-border-default:#d7d9df;--color-token-main-surface-primary:#fff;--color-token-sidebar-surface-primary:#f7f7f8;
 }
-html[data-fairy-codex][data-fairy-theme="light"] * {
+html[data-fairy-codex][data-fairy-theme="light"],
+html[data-fairy-codex][data-fairy-theme="light"] body,
+html[data-fairy-codex][data-fairy-theme="light"] [data-fairy-main],
+html[data-fairy-codex][data-fairy-theme="light"] aside.app-shell-left-panel {
   --color-text-primary:#202123!important;--color-text-primary-surface:#202123!important;--color-text-primary-ghost-hover:#202123!important;--color-text-primary-outline:#202123!important;--color-text-primary-soft-alt:#202123!important;
   --color-text-secondary:#60646c!important;--color-text-secondary-solid:#60646c!important;--color-text-secondary-ghost:#60646c!important;--color-text-secondary-outline:#60646c!important;--color-text-secondary-soft-alt:#60646c!important;--color-text-tertiary:#737780!important;
   --color-surface:#fff!important;--color-surface-primary:#fff!important;--color-surface-secondary:#f7f7f8!important;--color-surface-tertiary:#ececef!important;--color-surface-canvas:#fff!important;
@@ -266,14 +272,20 @@ html[data-fairy-codex][data-fairy-theme="light"] :is([role="dialog"],[role="menu
 #fairy-codex-overlay[data-theme="light"] .fairy-hardware :is(label,.fairy-hardware-power) {background:#fff!important;border-color:#bcc2ce!important;color:#303238!important;box-shadow:0 1px 2px #2021230d!important}
 #fairy-codex-overlay[data-theme="light"] .fairy-workspace-menu button:hover {background:#eceef4}
 #fairy-codex-overlay[data-theme="light"] .fairy-workspace-menu button:focus-visible {background:#e6eaf5}
-html[data-fairy-codex][data-fairy-theme="light"] * {
+html[data-fairy-codex][data-fairy-theme="light"],
+html[data-fairy-codex][data-fairy-theme="light"] body,
+html[data-fairy-codex][data-fairy-theme="light"] [data-fairy-main],
+html[data-fairy-codex][data-fairy-theme="light"] aside.app-shell-left-panel {
   --wb-text-primary:#202123!important;--app-color-text-foreground:#202123!important;--color-token-foreground:#202123!important;--color-token-dropdown-foreground:#202123!important;
   --color-text-primary-ghost:#202123!important;--color-text-primary-soft:#202123!important;--color-text-primary-outline-hover:#202123!important;--color-text-mode-toggle-primary:#202123!important;
   --app-color-text-foreground-tertiary:#737780!important;--color-token-description-foreground:#60646c!important;--color-token-text-link-foreground:#435fbd!important;--color-codex-editor-inline-code-foreground:#303238!important;
   --color-text-user-message:#26334b!important;--color-text-link:#435fbd!important;
 }
 html[data-fairy-codex][data-fairy-theme="light"] :is([data-user-message-bubble],[data-fairy-preview-message]) {--color-text-primary:#26334b!important;--color-text-user-message:#26334b!important}
-html[data-fairy-codex][data-fairy-theme="light"] * {
+html[data-fairy-codex][data-fairy-theme="light"],
+html[data-fairy-codex][data-fairy-theme="light"] body,
+html[data-fairy-codex][data-fairy-theme="light"] [data-fairy-main],
+html[data-fairy-codex][data-fairy-theme="light"] aside.app-shell-left-panel {
   --codex-base-ink:#202123!important;--color-text:#202123!important;--color-alpha:#202123!important;--wb-text-secondary:#60646c!important;--wb-text-tertiary:#737780!important;
   --color-text-emphasis:#202123!important;--color-text-button-outline:#303238!important;--color-text-execution-output:#303238!important;--color-text-execution-output-label:#60646c!important;--color-text-toolbar-action:#60646c!important;
   --color-codex-description:#60646c!important;--color-codex-icon-active:#303238!important;--app-color-icon-tertiary:#60646c!important;--app-color-text-button-tertiary:#60646c!important;--color-token-text-tertiary:#737780!important;
