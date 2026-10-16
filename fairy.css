@@ -321,3 +321,44 @@ html[data-fairy-codex] #fairy-codex-meter .fairy-quota-updated {font-size:11px;l
 html[data-fairy-codex][data-fairy-theme="light"] #fairy-codex-meter .fairy-quota {border-color:#e1e3e8}
 /* Keep the original home emblem from showing behind Fairy. */
 html[data-fairy-codex] [data-fairy-home-logo] {visibility:hidden!important;pointer-events:none!important}
+/* Dark palette must work even when the underlying Codex app uses light mode. */
+html[data-fairy-codex][data-fairy-theme="dark"],
+html[data-fairy-codex][data-fairy-theme="dark"] body,
+html[data-fairy-codex][data-fairy-theme="dark"] [data-fairy-main],
+html[data-fairy-codex][data-fairy-theme="dark"] aside.app-shell-left-panel,
+html[data-fairy-codex][data-fairy-theme="dark"] [data-fairy-main] [class*="_CodeSurface_"] {
+  --codex-base-ink:#e8edf5!important;--codex-base-surface:#080f1b!important;
+  --color-text:#e8edf5!important;--color-alpha:#e8edf5!important;
+  --color-text-primary:#e8edf5!important;--color-text-primary-surface:#e8edf5!important;--color-text-primary-ghost-hover:#e8edf5!important;--color-text-primary-outline:#e8edf5!important;--color-text-primary-soft-alt:#e8edf5!important;--color-text-primary-ghost:#e8edf5!important;--color-text-primary-soft:#e8edf5!important;--color-text-primary-outline-hover:#e8edf5!important;--color-text-mode-toggle-primary:#e8edf5!important;
+  --color-text-secondary:#afbdd0!important;--color-text-secondary-solid:#afbdd0!important;--color-text-secondary-ghost:#afbdd0!important;--color-text-secondary-outline:#afbdd0!important;--color-text-secondary-soft-alt:#afbdd0!important;--color-text-tertiary:#94a4bc!important;
+  --color-text-emphasis:#f3f6ff!important;--color-text-button-outline:#d2def0!important;--color-text-execution-output:#d2def0!important;--color-text-execution-output-label:#afbdd0!important;--color-text-toolbar-action:#afbdd0!important;--color-text-disabled:#7d8ca2!important;
+  --wb-text-primary:#e8edf5!important;--wb-text-secondary:#afbdd0!important;--wb-text-tertiary:#94a4bc!important;
+  --app-color-text-foreground:#e8edf5!important;--app-color-text-foreground-secondary:#afbdd0!important;--app-color-text-foreground-tertiary:#94a4bc!important;--app-color-foreground-application-menu:#e8edf5!important;--app-color-icon-tertiary:#afbdd0!important;--app-color-text-button-tertiary:#afbdd0!important;
+  --color-foreground:#e8edf5!important;--color-token-foreground:#e8edf5!important;--color-token-dropdown-foreground:#e8edf5!important;--color-token-text-primary:#e8edf5!important;--color-token-text-secondary:#afbdd0!important;--color-token-text-tertiary:#94a4bc!important;--color-token-description-foreground:#afbdd0!important;--color-token-text-link-foreground:#a9c8ff!important;
+  --color-codex-description:#afbdd0!important;--color-codex-icon-active:#d2def0!important;--color-codex-editor-inline-code-foreground:#dce7fa!important;
+  --color-text-user-message:#e5efff!important;--user-message-text-color:#e5efff!important;--color-text-link:#a9c8ff!important;
+  --color-background:#080f1b!important;--color-surface:#080f1b!important;--color-surface-primary:#080f1b!important;--color-surface-secondary:#172131!important;--color-surface-tertiary:#253145!important;--color-surface-canvas:#080f1b!important;--color-surface-card:#172131!important;--color-surface-recovery:#172131!important;
+  --color-surface-elevated:#242e3e!important;--color-surface-elevated-primary:#242e3e!important;--color-surface-elevated-secondary:#303b4d!important;--wb-surface-primary:#080f1b!important;--wb-surface-secondary:#172131!important;
+  --color-token-bg-primary:#080f1b!important;--color-token-bg-secondary:#172131!important;--color-token-bg-tertiary:#253145!important;--color-token-main-surface-primary:#080f1b!important;--color-token-sidebar-surface-primary:#3b4148!important;--color-token-side-bar-background:#3b4148!important;
+  --app-color-background-surface:#080f1b!important;--app-color-background-surface-under:#101824!important;--app-color-background-application-menu:#242e3e!important;
+  --color-background-composer-surface:#080f1b!important;--color-background-composer-action-bar:#172131!important;--color-background-execution-output:#172131!important;--color-background-segmented-form-selected:#303b4d!important;
+  --color-background-primary-soft-hover:#ffffff12!important;--color-background-primary-soft-active:#ffffff1c!important;--color-background-primary-soft-alpha:#ffffff0a!important;--color-background-primary-ghost-focus:#ffffff14!important;
+  --color-background-composer-primary:#cde6ff!important;--color-text-composer-primary:#122037!important;--color-background-primary-solid:#cde6ff!important;
+  --color-border:#52617a66!important;--color-border-default:#52617a66!important;--color-border-light:#52617a40!important;--color-border-strong:#687a98!important;--border-light:#52617a40!important;--app-color-border:#52617a66!important;--color-token-input-border:#687a9866!important;
+  --input-placeholder-text-color:#94a4bc!important;
+}
+html[data-fairy-codex][data-fairy-theme="light"],
+html[data-fairy-codex][data-fairy-theme="light"] body,
+html[data-fairy-codex][data-fairy-theme="light"] [data-fairy-main] {
+  --codex-base-surface:#fff!important;--color-background-composer-surface:#fff!important;
+  --app-color-background-surface-under:#f7f7f8!important;--color-surface-elevated:#fff!important;--color-surface-card:#fff!important;--color-surface-recovery:#f7f7f8!important;
+}
+html[data-fairy-codex][data-fairy-theme="dark"] [data-fairy-composer] {--color-background-composer-surface:#080f1b!important}
+html[data-fairy-codex][data-fairy-theme="light"] [data-fairy-composer] {--color-background-composer-surface:#fff!important}
+html[data-fairy-codex][data-fairy-theme="dark"] :is([role="menu"],[role="dialog"]) {background:#242e3e!important;color:#e8edf5!important;border-color:#52617a66!important}
+html[data-fairy-codex][data-fairy-theme="dark"] [data-fairy-main] [class*="_CodeSurface_"] {
+  background:#172131!important;color:#dce7fa!important;border-color:#52617a66!important;
+  --color-codex-icon:#dce7fa!important;--color-codex-icon-active:#f3f6ff!important;--color-codex-description:#afbdd0!important;
+  --codeblock-background-color:#172131!important;--codeblock-syntax-1:#efb278!important;--codeblock-syntax-2:#8cbbff!important;--codeblock-syntax-3:#9ad3ab!important;--codeblock-syntax-4:#e9a2d0!important;--codeblock-syntax-5:#c5acff!important;
+  --color-codex-syntax-comment:#96a5b9!important;--color-codex-syntax-keyword:#e9a2d0!important;--color-codex-syntax-string:#9ad3ab!important;--color-codex-syntax-literal:#efb278!important;--color-codex-syntax-name:#8cbbff!important;--color-codex-syntax-variable:#c5acff!important;--color-codex-syntax-attribute:#e1c48a!important;
+}
