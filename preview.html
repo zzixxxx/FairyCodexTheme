@@ -218,7 +218,7 @@
       if(r.width>=24&&r.width<=160&&r.height>=24&&r.height<=160&&r.top>=bounds.top+40&&r.bottom<(composerRect?.top||bounds.bottom))mark(svg,'data-fairy-home-logo');
     }
     overlay.dataset.layout = task ? 'task' : 'home';
-    const x = composerRect?.width ? composerRect.left + composerRect.width/2 : bounds.left + bounds.width / 2;
+    const x = bounds.left + bounds.width / 2;
     const available = Math.min(bounds.bottom, composerRect?.top || bounds.bottom - 100) - bounds.top;
     const y = task ? bounds.top + (innerHeight<=700?130:178) : bounds.top + Math.max(90, available * .36);
     setStyle(overlay,'--fairy-x', `${x}px`); setStyle(overlay,'--fairy-y', `${y}px`);
