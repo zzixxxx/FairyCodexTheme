@@ -24,8 +24,8 @@
   const control = overlay.querySelector('.fairy-control');
   const settings = overlay.querySelector('.fairy-settings');
   const stateLabel = overlay.querySelector('.fairy-state');
-  control.innerHTML='<span class="fairy-hdd-dot" aria-hidden="true"></span><span>H.D.D.</span>';
-  control.setAttribute('aria-label','H.D.D. 设置');
+  control.innerHTML='<span class="fairy-hdd-dot" aria-hidden="true"></span><span>H.D.D</span>';
+  control.setAttribute('aria-label','H.D.D 设置');
   control.insertAdjacentHTML('afterend','<button class="fairy-day-toggle" type="button" data-action="theme-toggle" aria-label="切换到日间模式" title="切换到日间模式">☀</button>');
   const brand=document.createElement('div');brand.id='fairy-codex-brand';
   // User-provided avatar, embedded so the live watcher and offline preview use the same asset.
