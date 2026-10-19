@@ -401,3 +401,33 @@ html[data-fairy-codex][data-fairy-theme="light"] [role="dialog"] {
 #fairy-codex-overlay .fairy-voice-status {min-height:20px;line-height:1.5;}
 html[data-fairy-theme=light] #fairy-codex-overlay .fairy-voice-panel input:not([type=checkbox]):not([type=range]),html[data-fairy-theme=light] #fairy-codex-overlay .fairy-voice-panel textarea {background:#fff;color:#202123;border-color:#abb5c4;}
 #fairy-codex-overlay .fairy-settings {box-sizing:border-box;max-height:calc(var(--fairy-console-top,calc(100vh - 70px)) - 110px);}
+
+#fairy-codex-overlay .dsh-fairy-sclera {animation-duration:var(--fairy-blink-duration,8s)}
+#fairy-codex-overlay[data-blink="off"] .dsh-fairy-sclera {animation:none}
+#fairy-codex-overlay .fairy-eye-settings {padding:10px 0;border-block:1px solid #8292ac40;margin:6px 0}
+#fairy-codex-overlay .fairy-eye-settings label {justify-content:space-between}
+#fairy-codex-overlay .fairy-eye-settings label span {display:flex;align-items:center;gap:8px}
+#fairy-codex-overlay .fairy-eye-settings input[type=range] {width:120px}
+#fairy-codex-overlay .fairy-eye-settings output {min-width:40px;text-align:right;font-variant-numeric:tabular-nums}
+#fairy-codex-overlay .fairy-eye-settings input[type=color] {appearance:auto;width:42px;height:28px;padding:2px;border:1px solid #8292ac80;border-radius:5px;background:transparent;cursor:pointer}
+#fairy-codex-overlay .fairy-eye-settings button {margin-top:4px}
+#fairy-codex-overlay .fairy-stage[data-custom-color] .dsh-fairy-main {--dsh-fairy-outer-halo-color:var(--fairy-eye-color)}
+#fairy-codex-overlay .fairy-stage[data-custom-color] #dsh-fairy-outer-gradient stop {stop-color:var(--fairy-eye-color)}
+#fairy-codex-overlay .fairy-stage[data-custom-color] #dsh-fairy-outer-gradient stop:last-child {stop-color:var(--fairy-eye-shade)}
+#fairy-codex-overlay .fairy-stage[data-custom-color] .dsh-fairy-corners {fill:var(--fairy-eye-dark)}
+#fairy-codex-overlay .fairy-stage[data-custom-color] .dsh-fairy-layer-three {fill:var(--fairy-eye-light)}
+#fairy-codex-overlay .fairy-stage[data-custom-color] circle[fill="#317bcf"] {fill:var(--fairy-eye-iris)}
+#fairy-codex-overlay .fairy-stage[data-custom-color] circle[fill="#3b3d8a"] {fill:var(--fairy-eye-dark)}
+#fairy-codex-overlay .fairy-stage[data-custom-color] .fairy-orbit {border-top-color:var(--fairy-eye-light);border-right-color:var(--fairy-eye-shade)}
+
+/* Settings typography follows the app's system text scale. */
+#fairy-codex-overlay .fairy-settings {font:14px/1.5 system-ui,-apple-system,"Segoe UI","Microsoft YaHei UI",sans-serif;letter-spacing:normal}
+#fairy-codex-overlay .fairy-settings :is(input,select,textarea,button) {font-family:inherit;font-size:inherit;line-height:1.5}
+#fairy-codex-overlay .fairy-settings strong {font:600 14px/1.5 system-ui,-apple-system,"Segoe UI","Microsoft YaHei UI",sans-serif;letter-spacing:.2px;margin-bottom:10px}
+#fairy-codex-overlay .fairy-settings label {padding:6px 0}
+#fairy-codex-overlay .fairy-settings label:has(input[type=checkbox]) {justify-content:flex-start;gap:8px}
+#fairy-codex-overlay .fairy-settings input[type=checkbox] {appearance:auto!important;display:inline-block!important;position:static!important;opacity:1!important;width:16px!important;height:16px!important;margin:0!important;flex:0 0 16px;clip-path:none!important}
+#fairy-codex-overlay .fairy-settings .fairy-voice-panel {font:inherit}
+#fairy-codex-overlay .fairy-settings .fairy-live-status {font-size:12px;line-height:1.5}
+#fairy-codex-overlay .fairy-settings .fairy-voice-status {font-size:13px;line-height:1.5}
+#fairy-codex-overlay {z-index:20}

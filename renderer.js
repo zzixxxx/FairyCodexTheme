@@ -12,10 +12,9 @@
   const overlay = document.createElement('div');
   overlay.id = 'fairy-codex-overlay';
   overlay.dataset.motion = 'on';
-  overlay.innerHTML = `<div class="fairy-stage" aria-hidden="true"><div class="fairy-orbit"></div>${eye}</div><div class="fairy-caption" aria-hidden="true"><small>HOLLOW DEEP DIVE SYSTEM</small><h1>你好，绳匠。</h1><p>Fairy 已接入。随时可以开始委托。</p><span class="fairy-state">FAIRY // STANDBY</span></div><button class="fairy-control" type="button" aria-label="Fairy 外观设置" aria-expanded="false" aria-controls="fairy-codex-settings">◉ FAIRY · HDD</button><section id="fairy-codex-settings" class="fairy-settings" aria-label="Fairy 外观设置" hidden><strong>FAIRY / VISUAL</strong><label><input type="checkbox" data-option="motion" checked> 动态眼睛与轨道</label><label><input type="checkbox" data-option="eye" checked> 显示 Fairy</label><label><input type="checkbox" data-option="power"> 低功耗模式</label><p class="fairy-motion-note">动画开关和低功耗模式都会暂停眼睛、轨道与鼠标跟随。低功耗模式是总开关，关闭后恢复原来的动画设置。</p><p class="fairy-live-status" aria-live="polite">HDD 待机</p><button type="button" data-action="restore">恢复 Codex 原貌</button></section>`;
+  overlay.innerHTML = `<div class="fairy-stage" aria-hidden="true"><div class="fairy-orbit"></div>${eye}</div><div class="fairy-caption" aria-hidden="true"><small>HOLLOW DEEP DIVE SYSTEM</small><h1>你好，绳匠。</h1><p>Fairy 已接入。随时可以开始委托。</p><span class="fairy-state">FAIRY // STANDBY</span></div><button class="fairy-control" type="button" aria-label="Fairy 外观设置" aria-expanded="false" aria-controls="fairy-codex-settings">◉ FAIRY · HDD</button><section id="fairy-codex-settings" class="fairy-settings" aria-label="Fairy 外观设置" hidden><strong>FAIRY / VISUAL</strong><section class="fairy-eye-settings" aria-label="眼睛外观"><strong>眼睛外观</strong><label>眼睛大小<span><input type="range" data-option="scale" aria-label="眼睛大小" min="70" max="120" step="5"><output data-eye-value="scale"></output></span></label><label>眨眼速度<select data-option="blink" aria-label="眨眼速度"><option value="0">不眨眼</option><option value="12">慢</option><option value="8">标准</option><option value="4">快</option></select></label><label>眼睛颜色<input type="color" data-option="color" aria-label="眼睛颜色"></label><button type="button" data-action="reset-eye">恢复默认眼睛</button></section><label><input type="checkbox" data-option="eye" checked> 显示 Fairy</label><label><input type="checkbox" data-option="power"> 低功耗模式</label><button type="button" data-action="restore">恢复 Codex 原貌</button></section>`;
   overlay.insertAdjacentHTML('beforeend',`<button class="fairy-workspace" type="button" aria-expanded="false" aria-controls="fairy-workspace-menu" data-action="workspace"><span>选择工作区</span><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10.2954 6.54537C10.5003 6.3404 10.8325 6.34051 11.0376 6.54537C11.2426 6.7504 11.2426 7.08253 11.0376 7.28756L8.60689 9.71822C8.27169 10.0534 7.72823 10.0534 7.39303 9.71822L4.96236 7.28756C4.75734 7.08253 4.75734 6.7504 4.96236 6.54537C5.16739 6.34035 5.49952 6.34035 5.70455 6.54537L7.99947 8.84029L10.2954 6.54537Z" fill="currentColor"/></svg></button><section class="fairy-workspace-menu" id="fairy-workspace-menu" aria-label="选择工作区" hidden><strong>选择工作区</strong><p>打开项目工作区，不更改当前聊天目录。</p><div class="fairy-project-list"></div><button type="button" data-action="add-project">＋ 添加工作区…</button></section>`);
   overlay.querySelector('.fairy-settings strong').insertAdjacentHTML('afterend',`<label>外观<select aria-label="外观模式" data-option="theme"><option value="dark">深潜夜间</option><option value="light">日间模式</option></select></label>`);
-  overlay.querySelector('.fairy-live-status').insertAdjacentHTML('afterend',`<p class="fairy-usage-note">今日电量为本机 Token 记录，每分钟刷新；剩余用量显示账户额度及重置时间；现金余额未接入。额度优先通过 Codex 账户接口查询，失败时回退到本机记录。</p>`);
   const meter=document.createElement('section');meter.id='fairy-codex-meter';meter.setAttribute('aria-label','用量概览');
   meter.innerHTML=`<div class="fairy-meter-summary"><span>余额</span><b data-metric="cash">—</b><span>今日电量</span><b data-metric="tokens" title="本机 Token 记录，尚未读取">—</b></div><section class="fairy-quota" aria-label="剩余用量"><header><span>剩余用量</span><button type="button" data-action="power" aria-pressed="false">普通模式</button></header><div class="fairy-quota-row" data-quota-row="primary"><span>5 小时</span><b data-metric="quota-primary">—</b><time>等待更新</time></div><div class="fairy-quota-row" data-quota-row="secondary"><span>1 周</span><b data-metric="quota-secondary">—</b><time>等待更新</time></div><p class="fairy-quota-updated">等待账户额度记录</p></section>`;
   document.head.append(style,widthStyle,dockStyle); document.body.append(overlay);
@@ -32,17 +31,32 @@
   brand.innerHTML=`<span class="fairy-brand-avatar" aria-hidden="true"><img src="data:image/webp;base64,UklGRvgPAABXRUJQVlA4WAoAAAAQAAAAjQAAjQAAQUxQSMcDAAABoDT9/+K2+W1mqghnFY90UI7GtyBfeZ2ZlJl77DsQlJkZ1yXjKczMzMwsORwZxdL+DqLd/f9/v+kxIiYARPaHX4r+uWL3uXupGcSZ1P1zu1f8GX0p7Ad6Ve3DNRNo+qMdH2sqHY6ur06W0XLjyjddDgLczy9Jo23zm553S03pHs+hzcu7ehRZNb37CIVMxZpk1DxaQmGzPzXLpnm1gUKXhpplEhoro/BFPSQLVzyHUkzHXVLoT6A0k5p4gRGU6khQsMX3UbLTj4vk/s1A+Q65hWk7jVK+0y7I41Mo6cLbQrxroLyXKbZ77F+U+nGHzbybUfJXvbbyH0DpJ/w2Cl5GAieCtlGTSOJN1Sbem0jkea8tHGeRzCMOGyjrkNC1inURJPV7y55AYl+3qD1DTb7dEvclJPe+24rfkOA1Fiw2KMLHTQtMI8kzAbPGkOhRkzQkWzPFOUHXNacZUSQ8akIoQ9lsqLE/kXS9oeYSbcXmRoaQ+KEGWsvUlVrr+xXJ/6muQJ6+uUA9UWRgpA7lDgeuKrW6kYXdtZbwYLyGJ8+DtKfa88jE56ut4cLSKq48F2bnVyxCNvZU/MyHbyqu8uEkAKgGH8oqgIaM1AA+5MSHAGs5sQogyYlboCIr1TAvwi/z4sUYL2I6LwaX82LjHl6cvcCLO3d5MTPNi0yaF1n8XzPLi9k0L6ZSvLh3jRcX9vJizwpeLNd5ocd4EXuZFy928iKs8kKFm5xIAKzhxGqAjzjxIcAAJwYA1DIfDBUATvIhCQDwPR/0ikV86KtwzXGhPL8ClnLhJFR9ngtvVfPM8aDkqQbjPFgPNbt50F1LucqBpFILohyIQp2BDH3ZQD3wE30/Qd2tJerKrfXBMHXD0GBLkbZSSyOg06ZDwwvnKEsvbAxilMXAROcNuq45zQCNLg3MHaVqFEwOTNH0MGAWPE7T42D+IEW/gYXuBD1n3VZAe46aqQ6w9klijCfB6l9peRcsV3ZRMqpYB44LdGx1gB19N6g44AN7qgkajqtg1+AVCk4Ewb4LjsvvzAKws3er7I77wN6Of+W21gF2V941JPa5AgI+MS2r3FMgZvtpOV3rAFHdf8joDzcI/Pg92aQeB7GDo3IZDYLwA9flcX0AZOiKz8phNu4CSYb0onhFPQQSbRkqiVUaagHJtv4yJ87cb60g4abIFTGuRJtA0krPeNpu6fGeeSBzzwtLM/ZJL33RA/J39n19yrCufPq7PieQqWqfrEmYd3PNJ5oK9Po7X4oPrtxz/n4qjZhO3T+/Z+Vg/KVOP4gMAFZQOCAKDAAAEDoAnQEqjgCOAD6ROpdIJaMiIS41XVCwEglmCHABita2/juym8R5Xzx67/Tfx50O6AfWX5tz3+grzAP1h6RPmJ86X0h/5b1AP7N1EfoNeXX7LX7pelNp3Xpz/OfQB5c/5Py/s0YEX4T/devLtF4AXrLe/M0eg/M4VgTSvIZ9aewn+tnW5bV4Zh1t39J5zIPkG8Ci6oK0U5m1W8pEXBRbopynFGhHa6zpbPT6Q5lg1+QVl4Taoz+N5ZcWhcWaLULaQs//TjdYyX8jKkpfFId170e3VIIOSgvE/MINrz7/hB+AhQkP20LGehDAlogirVWLlgBu1JK/fmHH7MxhU/gm7l/OVS+mFB1x58qEgtCqwOgt9khUPtsXRTFt6HADj/8QWI9x9h1jwU8BuUQAhA8rREef1+8TSWRX9fBSuvQd/Uj37aRngaPbo115HQF2sz8epA88i9FFKQgcaxS8ll0bt6JG9x3FTqjV1t4y8PfsCZSMrl9gljKuSDDnMNfjlYU6Pj8bt8tt8JFGvZ+JWN2DHTA86dV31s39sa8VlLG8Ignr2h8ZL5ZDR2//0AYJBH+sEyjcCpTyUmA15xFW7CG2ph/AzA38tbzNy1sQ/uvQO8IY583qlD1tUgAA/t/oDZ/s4HkFI33Usxv5DRcVONYGi8eI+DbM54RoMzTdABe2jGGZks9i3o58SljCcctG+wv73MES2LLA5W4UwHqpXmxOIIEU/xkaTJUb42yh/uKmCDiMo9FTHq9/e1WmM0Knqo6TIoP/LFEoKovkE1X5KOYZLT+pSelI6UjiBkMFntI1D6K7z+YwQScZf9Y0VB22zJ4bQLGXMrbJkiT64B9jq/Y/8we1Gri/KyL+/fJDKxHT8aS/3uc5GVT9QBE7ktqjrAiovfJjTSf2Rj6YAm9zpudc6TtYPVSSBtOI0yjshWGvJAe/hKh00OY9H6W0C66pAdbFq0Xo5SZaCDuTZX9b3PiiquI3hmHlsXkrVFbXp4nvjekf1Tg8QoYzXkILmrbpULiryav482nD5NOUa7i9Oh6R2unWn277TqXjC9nodO5EnYbcywlg1LvwTICbSemMQ1QfCC5GO7ApXYEGMtjYlWsfIu7of5OeDpcetgbu0ufufplqnR2M0+IRTikRgcQ1JZPXd56xzaWFNam7QTF3P3uaw4Q7NNEm8ycd8dT10BaONoJqbkcl/3vjZtlGi91HpnKTg6H85HKyFPOiUT8Z4i8DaK/C0n+eIxJzaRy5WCgPzNtGauIRcgRcnLP9odzC3rVbHI0ZbaYzlkIH2qpyMN1fwnv7XMYXEgRlMMDy1dQM0JGe5xqDDPH1Mxu966TA4qoJtFJO3Q19ZD3WLCK3Ya0gxNQ6unEG5TgYJJXcUJ1oiIzFgCMnHsfL4mgR9K9N2xUI2u1wA9ZEOWL7VJ9r99LjqlQvDH9bBp2CeGKaP+5/3LT3xnCPwdkGwu6lMoDZhYHAe4wn/Eflb3/psunaFC0Qafz5xBKq0OiJfy5qP5Pq29txpYpAMcT1n+vyYVFIEyt4LKKRvvk8OEHBd/Hr10pZ1m6JPhcK4wJSxCkl9lbyUuLkuj8GT3m0IK9RCA1+UC6Px8I3b97n9+w3vPzn/O+Q25Po6v/pp+R3I56VIPqTAaulhP2YhcC0p6gG3zabn8l7UDoKru1sKJ9xF1Ahf8OLOMNcu3Ax9MZ7YdPIB29Z+UW1g6zB33M4xDulDhreH5LLhWaLC9ZzqmzAnzND8F5ugMRF4e+K/AQL/Rp26a17mPQd6WI3h/CuU/8TtUCNeifEhACojz/GxR6IpP+wD/QPJtXxl1+nefNzpGF/kroAXHdOz7/sOBi9Nmu+AqH9Tjsk3gOKkzpYsp+Bw+Kfbn9E9Z8B/sDo8bA/pNGvAssK8Wu+Iznxkvf9bcn8j1ERM1WZNmUHs1AoOw21N2to7eRSCsKilpu8dVpEQwapd0Y3mBGjWrGKbPjuOy1+oSiObX3AT5zrV8Bt08TxGPm/1mzsv567WVeq+LTDE6S6aTEIghUAKL5N/daEBqnf9CPgjWv7Dn6TUMpuQs8bWJ/7ldjtTQJ+xX5UmgJwz+UKoINAc2gDUoCzFfnsSLs+3K5SEJpWZ07TXxkNoFEPSys4PsTMMzxTnmKBr8DXcH4kho7yMloYa+pqAb04TC0OYMMv/OvBj5UHMnXnm3npDnPzVtbjevnlWh3Fu+nNgwKRv6zdxdu+zibqBTAgxSe2uOqWhqHpMM138x7r0b9INLH5wO1h3wRsxlsbM78/xr+H9zLs6hLoM6j8I93busb1V/9jts6P2oXXqqF6FtRTEw87uwdW/npvONaJAO9Jx7XT47Wg78dXqBauwLgYjnRCw9TNvyTitsTgS5h6tubx8oAEsyr4ZJL3t+B/h9Yf/UY8J5ZcIVsl51MD8F3lWW/7WX76n1njljIHk5qWZ5TgOW4bTL0A4lLqXAD1N41Hwfbd3C7545iKYH+xUtBqmuQpoIRrrlZVUFt+gSGYz0lX9rJ7ubuQBwI3LT39mfCizSR9MFHbeR3EL2pp5KOuHWIRYqjiLB3xYxw0nF8mhmxlR6t+E12srRYt5zd8k6HO4cZvVFLP5HgdB7mQQbiizW66cW7B0N/76rw+ym+tuY1sckiovf5TpvqKUPH/OVocHyp2E9yRLMKhR44l5txPZOXpL17K1avx/4CZGKM3B9esYNUfptTprY375XwkbW8CcPQBph/L4kyuB1ZaNLIsNbjuH2hjFlq+OPNbEloKd9TTIRvLFEUWOiW8thAxefJ/6GFoWoJyqZWu56pX94t5umA8bWh6Ch+7esAoNw+TVUqkQnBB8q7S3bpFxVnFlywlCQHvXDsBjvOze7TGrLUewIsNbElb3ECu5UnUTPNwr63EsqJlfb9AlovcKleJ6Fu9e6Wznktp/Lg2N7/E/4U29skaK4fCxN6HHauLcaRdEJ8xmjDyiI8QG5nBrYdltSSwOe7R1B+qG8atmHfdqFo/uBsyzsisFjbyXZ9zmarLAzpvxIdXJZilPJ802nWSbB0U3YaoQ6wkF97eRoEkna9HBODKG5FnGY8HSEQGKJhpjnPd9vFz0zXZ7nsf9JBAsAf6AyibjzV+rWYQ96do7GCzzF6qjciNYbCoqhFnQqO/D9D1ylfp6yjDnwocpQiLlC+j6JWGwIYOAzn4OZ5ZwAmOe+znNdj9gIlvkBOLjUVy+h3YBc0ITiMYP1rh1ooh17+fh/LFHNoPnAB+PoaAH863ddX/3oGgpk6YT8gUFr06AJnaZSo26j1WuiL/cXqsdiXur1+ZkVJY+9P8+BBXgKq4o1MpiVXnc8P0r71X3zi2QqgACPzkb0rMJkgqIhZDiBFi87DEU5QzqhzWczbT/UNfHmJRoWNsddbGkt/248OXEy8i+X4Nb281OZfQsMF5Rcfcn6gl+zdfIo4td0Etk9rZaAAEpuuCFW7VjVb34dfcCUdFB8fXnvQ8WhhmNHtR99Fe0GAJAeDf/l40OAjI9rhdaIIjZTiPLUul+vpOAAOtJidHTvHAOJ/iTnNErcfCiUVshK67Lf998OR31jMJJY/9pYMkawn9FGOBDrO7ySv1T7qTMi9SxNAhvcIi+doayNcSJStRRh/KJdn9/a5yeNxkQKPZ5SlesJHfex51BXmnRAO4nhMKmL6gNV0sWRGZh2bAfcX4j01XQGoEvFG05Te3NIyif5d83+bIPTqrsj3SkGvPE1JR+uEAS3dNgriiToGB/vLnzLAIO/NNaPkyX1AwDdw13ky+hEFz9+DiqHQE9W2fxLfLTSZ+50fam8AShAFYeXYJIbxroRT1dL/98lWBJv8+oMmmhJlNoSDdDcONr3oRYVn9aSkRrSrhRKZv8SMsfGhgAPhX3jzQlo+f+2qAABQKAcQHKP8BQ9YAe3IJj+S4Z2bXt9z0UxF/bc8IAyDjqNMf2Iyu5l79+RhWd1Pl2hEYxFK+y/iCxE6LUKKqp9/qLuLjwIQeWh+i8qryo6u7G/qw8MFvT6JO79gLkpw2Tf4eFJyuJWHstSeKP6YfM4/7qburO5755chjKv3c7KbC+d3DSp7qef/MwA/ToQbpvB3f/+NC//4y1//+MOWRfAAAAA==" alt="" draggable="false"></span><span class="fairy-brand-copy"><strong>Fairy</strong><small>空洞深潜辅助系统</small></span>`;
   let saved = {};
   try { saved = JSON.parse(localStorage.getItem('fairy-codex-visual-v1') || '{}') || {}; } catch {}
-  let motion = saved.motion !== false, showEye = saved.eye !== false, lowPower = saved.power === true;
+  let motion = true, showEye = saved.eye !== false, lowPower = saved.power === true;
   let theme=saved.theme==='light'?'light':'dark';
   const clamp=(n,min,max,fallback)=>typeof n==='number'&&Number.isFinite(n)?Math.max(min,Math.min(max,n)):fallback;
   let eyeScale=clamp(saved.scale,70,120,100), speed=clamp(saved.speed,30,150,70);
-  function save() {try{localStorage.setItem('fairy-codex-visual-v1',JSON.stringify({motion,eye:showEye,power:lowPower,scale:eyeScale,speed,theme}));}catch{}}
+  let blink=[0,4,8,12].includes(saved.blink)?saved.blink:8;
+  let eyeColor=/^#[0-9a-f]{6}$/i.test(saved.color||'')?saved.color:'#4053f0';
+  function save() {try{localStorage.setItem('fairy-codex-visual-v1',JSON.stringify({motion,eye:showEye,power:lowPower,scale:eyeScale,speed,theme,blink,color:eyeColor}));}catch{}}
   overlay.dataset.motion=motion?'on':'off';overlay.dataset.power=lowPower?'low':'normal';
-  for(const [key,value] of Object.entries({motion,eye:showEye,power:lowPower})) overlay.querySelector(`[data-option="${key}"]`).checked=value;
-  setStyle(overlay,'--fairy-eye-scale',String(eyeScale/100));setStyle(overlay,'--fairy-orbit-duration',`${28*70/speed}s`);
+  for(const [key,value] of Object.entries({eye:showEye,power:lowPower})) overlay.querySelector(`[data-option="${key}"]`).checked=value;
+  function applyEye(){
+    setStyle(overlay,'--fairy-eye-scale',String(eyeScale/100));
+    setStyle(overlay,'--fairy-orbit-duration',`${28*70/speed}s`);
+    setStyle(overlay,'--fairy-blink-duration',`${blink||8}s`);
+    overlay.dataset.blink=blink===0?'off':'on';
+    stage.toggleAttribute('data-custom-color',eyeColor.toLowerCase()!=='#4053f0');
+    const rgb=[1,3,5].map(i=>parseInt(eyeColor.slice(i,i+2),16));
+    const mix=(amount,target)=>`rgb(${rgb.map(v=>Math.round(v*(1-amount)+target*amount)).join(', ')})`;
+    for(const [key,value] of Object.entries({color:eyeColor,dark:mix(.5,0),shade:mix(.2,0),light:mix(.55,255),iris:mix(.15,255)}))setStyle(stage,`--fairy-eye-${key}`,value);
+    overlay.querySelector('[data-option="scale"]').value=String(eyeScale);
+    overlay.querySelector('[data-eye-value="scale"]').textContent=eyeScale+'%';
+    overlay.querySelector('[data-option="blink"]').value=String(blink);
+    overlay.querySelector('[data-option="color"]').value=eyeColor;
+  }
+  applyEye();
   overlay.querySelector('[data-option="theme"]').value=theme;
   const workspace=overlay.querySelector('.fairy-workspace'),workspaceMenu=overlay.querySelector('.fairy-workspace-menu');
-  const liveStatus = overlay.querySelector('.fairy-live-status');
   function mark(node, attr) {
     if (!node) return;
     if (!marked.has(node)) marked.set(node, new Map());
@@ -241,8 +255,6 @@
     overlay.dataset.busy = String(busy);
     const label = busy ? 'FAIRY // PROCESSING' : 'FAIRY // STANDBY';
     if (stateLabel.textContent !== label) stateLabel.textContent = label;
-    const status = lowPower ? 'HDD 低功耗 · 动态效果暂停' : busy ? 'HDD 正在处理委托' : 'HDD 待机 · Fairy 已接入';
-    if(liveStatus.textContent!==status) liveStatus.textContent=status;
   }
   function schedule() {
     if(disposed||timer)return;
@@ -296,6 +308,7 @@
     if(e.target.closest('.fairy-control')===control) {settings.hidden = !settings.hidden; control.setAttribute('aria-expanded',String(!settings.hidden));}
     if(e.target.closest('[data-action="theme-toggle"]')) {theme=theme==='light'?'dark':'light';setTheme();save();}
     if(e.target.closest('[data-action="restore"]')) dispose();
+    if(e.target.closest('[data-action="reset-eye"]')) {eyeScale=100;blink=8;eyeColor='#4053f0';applyEye();eyeRect=null;save();}
     if(e.target.closest('[data-action="workspace"]')) {if(workspaceMenu.hidden)showWorkspaces();else{workspaceMenu.hidden=true;workspace.setAttribute('aria-expanded','false');}}
     if(e.target.closest('[data-project-index]')) {const node=projectTargets[Number(e.target.closest('[data-project-index]').dataset.projectIndex)];if(node?.isConnected)node.click();workspaceMenu.hidden=true;workspace.setAttribute('aria-expanded','false');}
     if(e.target.closest('[data-action="add-project"]')) {document.querySelector('aside [data-app-action-sidebar-project-create]')?.click();workspaceMenu.hidden=true;workspace.setAttribute('aria-expanded','false');}
@@ -309,10 +322,12 @@
     if(e.target.dataset.option === 'eye') {showEye = e.target.checked;refresh();}
     if(e.target.dataset.option === 'power') {lowPower=e.target.checked;overlay.dataset.power=lowPower?'low':'normal';refresh();}
     if(e.target.dataset.option === 'theme') {theme=e.target.value==='light'?'light':'dark';setTheme();}
+    if(e.target.dataset.option==='blink') {blink=[0,4,8,12].includes(Number(e.target.value))?Number(e.target.value):8;applyEye();}
     save();
   }
   function onInput(e) {
-    if(e.target.dataset.option === 'scale') {eyeScale=clamp(Number(e.target.value),70,120,100);setStyle(overlay,'--fairy-eye-scale',String(eyeScale/100));}
+    if(e.target.dataset.option==='color'&&/^#[0-9a-f]{6}$/i.test(e.target.value)) {eyeColor=e.target.value;applyEye();}
+    if(e.target.dataset.option === 'scale') {eyeScale=clamp(Number(e.target.value),70,120,100);applyEye();eyeRect=null;}
     if(e.target.dataset.option === 'speed') {speed=clamp(Number(e.target.value),30,150,70);setStyle(overlay,'--fairy-orbit-duration',`${28*70/speed}s`);}
     save();
   }
