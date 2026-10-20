@@ -30,7 +30,7 @@ html[data-fairy-codex] [data-fairy-sidebar-header] {padding-top:4px!important;pa
 html[data-fairy-codex] [data-fairy-sidebar-header]::before {content:"◉  Fairy";display:block;color:#edf0f7;font:600 17px "Segoe UI",sans-serif;letter-spacing:1px;padding:9px 10px 0;text-shadow:0 1px 2px #0007}
 html[data-fairy-codex] [data-fairy-sidebar-header]::after {background:none!important;box-shadow:none!important}
 html[data-fairy-codex] [data-fairy-new-chat] {display:flex!important;justify-content:center!important;align-items:center!important;min-height:38px!important;border:1px solid #88929e55!important;border-radius:6px!important;background:linear-gradient(#3b424a,#30373e)!important;box-shadow:inset 1px 1px #ffffff0c,0 0 0 2px #0000000c,0 2px 5px #0002!important;color:#eef1f8!important;font-weight:600!important}
-html[data-fairy-codex] [data-fairy-sidebar-nav]::after {content:"H.D.D";display:block;flex-shrink:0;margin:0 10px 10px;padding:10px;border:1px solid #88929e40;border-radius:6px;background:#30373e;box-shadow:inset 1px 1px #ffffff0a;font:9px Consolas,monospace;letter-spacing:2px;color:#bdc8dc}
+html[data-fairy-codex] [data-fairy-sidebar-nav]::after {content:"H.D.D  /  FAIRY VISUAL";display:block;flex-shrink:0;margin:0 10px 10px;padding:10px;border:1px solid #88929e40;border-radius:6px;background:#30373e;box-shadow:inset 1px 1px #ffffff0a;font:9px Consolas,monospace;letter-spacing:2px;color:#bdc8dc}
 html[data-fairy-codex] [data-fairy-history] {
   background:radial-gradient(ellipse at 50% 0,#59429f3b,transparent 38%),linear-gradient(#8bd9ff04 1px,transparent 1px),linear-gradient(90deg,#8bd9ff04 1px,transparent 1px),#080f1b!important;
   background-size:auto,48px 48px,48px 48px,auto!important;
