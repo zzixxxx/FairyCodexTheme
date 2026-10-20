@@ -440,3 +440,34 @@ html[data-fairy-codex] [data-fairy-main] {border-radius:10px;box-shadow:0 0 10px
 #fairy-codex-overlay .fairy-control {right:calc(var(--fairy-pane-right,0px) + 60px)}
 #fairy-codex-overlay .fairy-day-toggle,#fairy-codex-overlay .fairy-settings {right:calc(var(--fairy-pane-right,0px) + 22px)}
 #fairy-codex-overlay .fairy-settings {width:min(350px,calc(var(--fairy-pane-width,100vw) - 24px))}
+/* Aligned settings fields with on-demand percentage editing. */
+#fairy-codex-overlay .fairy-settings {--fairy-field-bg:#222b38;--fairy-field-border:#8292ac80;--fairy-field-text:#e0e8f7;--fairy-popover-bg:#303a48}
+#fairy-codex-overlay[data-theme=light] .fairy-settings {--fairy-field-bg:#fff;--fairy-field-border:#bac4d2;--fairy-field-text:#303e52;--fairy-popover-bg:#fff}
+#fairy-codex-overlay .fairy-settings :is(label:not(:has(input[type=checkbox])),.fairy-setting-row) {display:grid;grid-template-columns:minmax(72px,1fr) minmax(0,164px);align-items:center;gap:12px;margin:0;padding:7px 0}
+#fairy-codex-overlay .fairy-settings :is(select,input[type=color],input[type=url],input[type=text],textarea,.fairy-percent summary) {box-sizing:border-box;width:100%;max-width:none;min-width:0;height:34px;margin:0;padding:5px 9px;border:1px solid var(--fairy-field-border);border-radius:6px;background:var(--fairy-field-bg);color:var(--fairy-field-text)}
+#fairy-codex-overlay .fairy-settings input[type=color] {cursor:pointer;padding:5px}
+#fairy-codex-overlay .fairy-settings textarea {height:70px;resize:vertical}
+#fairy-codex-overlay .fairy-section-heading {display:flex;align-items:center;justify-content:space-between;margin:0 0 4px}
+#fairy-codex-overlay .fairy-section-heading strong {margin:0}
+#fairy-codex-overlay .fairy-section-heading [data-action=reset-eye] {display:grid;place-items:center;width:28px;height:28px;padding:0;margin:0;border-color:transparent!important;background:transparent!important;box-shadow:none}
+#fairy-codex-overlay .fairy-section-heading [data-action=reset-eye]:hover {border-color:var(--fairy-field-border)!important;background:var(--fairy-field-bg)!important}
+#fairy-codex-overlay .fairy-appearance-options {margin:6px 0 16px}
+#fairy-codex-overlay .fairy-eye-settings {border-bottom:0;padding-bottom:0}
+#fairy-codex-overlay .fairy-percent {position:relative;min-width:0}
+#fairy-codex-overlay .fairy-percent summary {display:flex;align-items:center;justify-content:space-between;list-style:none;cursor:pointer;user-select:none;font-variant-numeric:tabular-nums}
+#fairy-codex-overlay .fairy-percent summary::-webkit-details-marker {display:none}
+#fairy-codex-overlay .fairy-percent summary output {min-width:0;text-align:left}
+#fairy-codex-overlay .fairy-percent summary span {opacity:.6}
+#fairy-codex-overlay .fairy-percent-popover {position:absolute;z-index:5;right:0;top:calc(100% + 6px);box-sizing:border-box;width:228px;max-width:calc(100vw - 80px);padding:12px;background:var(--fairy-popover-bg);border:1px solid var(--fairy-field-border);border-radius:9px;box-shadow:0 8px 24px #0003;display:flex;align-items:center;gap:10px}
+#fairy-codex-overlay .fairy-settings .fairy-percent-popover input[type=range] {flex:1;min-width:0;width:100%;margin:0}
+#fairy-codex-overlay .fairy-percent-entry {display:flex;align-items:center;gap:4px;font-variant-numeric:tabular-nums}
+#fairy-codex-overlay .fairy-settings .fairy-percent-entry input[type=number] {box-sizing:border-box;width:56px;min-width:0;height:30px;padding:3px 5px;border:1px solid var(--fairy-field-border);border-radius:5px;background:var(--fairy-field-bg);color:var(--fairy-field-text);appearance:textfield}
+#fairy-codex-overlay .fairy-percent-entry input::-webkit-inner-spin-button {appearance:none}
+#fairy-codex-overlay .fairy-voice-panel {margin-top:14px;padding-top:16px}
+#fairy-codex-overlay .fairy-voice-actions {display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+#fairy-codex-overlay .fairy-voice-actions button {width:100%;min-height:34px;margin:0;padding:6px 8px}
+#fairy-codex-overlay .fairy-voice-status {margin:10px 0;color:var(--fairy-field-text);opacity:.8}
+#fairy-codex-overlay .fairy-voice-panel details:not(.fairy-percent) {padding-top:10px;border-top:1px solid var(--fairy-field-border)}
+#fairy-codex-overlay .fairy-voice-panel details:not(.fairy-percent)>summary {cursor:pointer;font-size:13px}
+#fairy-codex-overlay .fairy-settings :is(input,select,textarea,summary,button):focus-visible {outline:2px solid #879cff;outline-offset:2px}
+#fairy-codex-overlay .fairy-percent:not([open])>.fairy-percent-popover {display:none!important}

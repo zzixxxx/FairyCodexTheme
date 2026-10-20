@@ -37,7 +37,7 @@
   const overlay = document.createElement('div');
   overlay.id = 'fairy-codex-overlay';
   overlay.dataset.motion = 'on';
-  overlay.innerHTML = `<div class="fairy-stage" aria-hidden="true"><div class="fairy-orbit"></div>${eye}</div><div class="fairy-caption" aria-hidden="true"><small>HOLLOW DEEP DIVE SYSTEM</small><h1>你好，绳匠。</h1><p>Fairy 已接入。随时可以开始委托。</p><span class="fairy-state">FAIRY // STANDBY</span></div><button class="fairy-control" type="button" aria-label="Fairy 外观设置" aria-expanded="false" aria-controls="fairy-codex-settings">◉ FAIRY · HDD</button><section id="fairy-codex-settings" class="fairy-settings" aria-label="Fairy 外观设置" hidden><strong>FAIRY / VISUAL</strong><section class="fairy-eye-settings" aria-label="眼睛外观"><strong>眼睛外观</strong><label>眼睛大小<span><input type="range" data-option="scale" aria-label="眼睛大小" min="70" max="120" step="5"><output data-eye-value="scale"></output></span></label><label>眨眼速度<select data-option="blink" aria-label="眨眼速度"><option value="0">不眨眼</option><option value="12">慢</option><option value="8">标准</option><option value="4">快</option></select></label><label>眼睛颜色<input type="color" data-option="color" aria-label="眼睛颜色"></label><button type="button" data-action="reset-eye">恢复默认眼睛</button></section><label><input type="checkbox" data-option="eye" checked> 显示 Fairy</label><label><input type="checkbox" data-option="power"> 低功耗模式</label><button type="button" data-action="restore">恢复 Codex 原貌</button></section>`;
+  overlay.innerHTML = `<div class="fairy-stage" aria-hidden="true"><div class="fairy-orbit"></div>${eye}</div><div class="fairy-caption" aria-hidden="true"><small>HOLLOW DEEP DIVE SYSTEM</small><h1>你好，绳匠。</h1><p>Fairy 已接入。随时可以开始委托。</p><span class="fairy-state">FAIRY // STANDBY</span></div><button class="fairy-control" type="button" aria-label="Fairy 外观设置" aria-expanded="false" aria-controls="fairy-codex-settings">◉ FAIRY · HDD</button><section id="fairy-codex-settings" class="fairy-settings" aria-label="Fairy 外观设置" hidden><strong>FAIRY / VISUAL</strong><div class="fairy-appearance-options"><label><input type="checkbox" data-option="eye" checked> 显示 Fairy</label><label><input type="checkbox" data-option="power"> 低功耗模式</label><button type="button" data-action="restore">恢复 Codex 原貌</button></div><section class="fairy-eye-settings" aria-label="眼睛外观"><div class="fairy-section-heading"><strong>眼睛</strong><button type="button" data-action="reset-eye" aria-label="恢复默认眼睛" title="恢复默认眼睛"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 11a9 9 0 1 1 2.5 7M3 4v7h7"/></svg></button></div><div class="fairy-setting-row"><span>眼睛大小</span><span data-percent-slot="scale"></span></div><label>眨眼速度<select data-option="blink" aria-label="眨眼速度"><option value="0">不眨眼</option><option value="12">慢</option><option value="8">标准</option><option value="4">快</option></select></label><label>眼睛颜色<input type="color" data-option="color" aria-label="眼睛颜色"></label></section></section>`;
   overlay.insertAdjacentHTML('beforeend',`<button class="fairy-workspace" type="button" aria-expanded="false" aria-controls="fairy-workspace-menu" data-action="workspace"><span>选择工作区</span><svg aria-hidden="true" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10.2954 6.54537C10.5003 6.3404 10.8325 6.34051 11.0376 6.54537C11.2426 6.7504 11.2426 7.08253 11.0376 7.28756L8.60689 9.71822C8.27169 10.0534 7.72823 10.0534 7.39303 9.71822L4.96236 7.28756C4.75734 7.08253 4.75734 6.7504 4.96236 6.54537C5.16739 6.34035 5.49952 6.34035 5.70455 6.54537L7.99947 8.84029L10.2954 6.54537Z" fill="currentColor"/></svg></button><section class="fairy-workspace-menu" id="fairy-workspace-menu" aria-label="选择工作区" hidden><strong>选择工作区</strong><p>打开项目工作区，不更改当前聊天目录。</p><div class="fairy-project-list"></div><button type="button" data-action="add-project">＋ 添加工作区…</button></section>`);
   overlay.querySelector('.fairy-settings strong').insertAdjacentHTML('afterend',`<label>外观<select aria-label="外观模式" data-option="theme"><option value="dark">深潜夜间</option><option value="light">日间模式</option></select></label>`);
   const meter=document.createElement('section');meter.id='fairy-codex-meter';meter.setAttribute('aria-label','用量概览');
@@ -48,6 +48,24 @@
   const control = overlay.querySelector('.fairy-control');
   const settings = overlay.querySelector('.fairy-settings');
   const stateLabel = overlay.querySelector('.fairy-state');
+  // Shared percentage editor: compact value at rest, slider and exact entry on demand.
+  function percentageControl({label,min,max,step=1,value,factor=1,attribute,key}) {
+    const host=document.createElement('details');host.className='fairy-percent';
+    host.innerHTML=`<summary aria-label="${label}调节"><output>${Math.round(value*factor)}%</output><span aria-hidden="true">⌄</span></summary><div class="fairy-percent-popover"><input type="range" min="${min}" max="${max}" step="${step}" aria-label="${label}" ${attribute}="${key}"><div class="fairy-percent-entry"><input type="number" min="${min*factor}" max="${max*factor}" step="1" aria-label="${label}百分比"><span>%</span></div></div>`;
+    const range=host.querySelector('[type=range]'),number=host.querySelector('[type=number]'),output=host.querySelector('output');
+    if(key==='scale')output.dataset.eyeValue='scale';
+    host.syncPercent=value=>{range.value=String(value);number.value=String(Math.round(value*factor));output.textContent=Math.round(value*factor)+'%';};
+    const commit=()=>{if(number.value==='')return;const value=Math.max(min,Math.min(max,Number(number.value)/factor));host.syncPercent(value);range.dispatchEvent(new Event('input',{bubbles:true}));};
+    number.addEventListener('input',()=>{const value=Number(number.value)/factor;if(number.value!==''&&value>=min&&value<=max){range.value=String(value);output.textContent=Math.round(value*factor)+'%';range.dispatchEvent(new Event('input',{bubbles:true}));}});
+    number.addEventListener('change',commit);
+    number.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();commit();host.open=false;host.querySelector('summary').focus();}});
+    range.addEventListener('input',()=>host.syncPercent(Number(range.value)));
+    host.addEventListener('toggle',()=>{if(host.open)for(const other of settings.querySelectorAll('.fairy-percent[open]'))if(other!==host)other.open=false;});
+    host.syncPercent(value);return host;
+  }
+  const scaleControl=percentageControl({label:'眼睛大小',min:70,max:120,value:100,attribute:'data-option',key:'scale'});
+  overlay.querySelector('[data-percent-slot="scale"]').replaceWith(scaleControl);
+
   control.innerHTML='<span class="fairy-hdd-dot" aria-hidden="true"></span><span>H.D.D</span>';
   control.setAttribute('aria-label','H.D.D 设置');
   control.insertAdjacentHTML('afterend','<button class="fairy-day-toggle" type="button" data-action="theme-toggle" aria-label="切换到日间模式" title="切换到日间模式">☀</button>');
@@ -74,8 +92,7 @@
     const rgb=[1,3,5].map(i=>parseInt(eyeColor.slice(i,i+2),16));
     const mix=(amount,target)=>`rgb(${rgb.map(v=>Math.round(v*(1-amount)+target*amount)).join(', ')})`;
     for(const [key,value] of Object.entries({color:eyeColor,dark:mix(.5,0),shade:mix(.2,0),light:mix(.55,255),iris:mix(.15,255)}))setStyle(stage,`--fairy-eye-${key}`,value);
-    overlay.querySelector('[data-option="scale"]').value=String(eyeScale);
-    overlay.querySelector('[data-eye-value="scale"]').textContent=eyeScale+'%';
+    scaleControl.syncPercent(eyeScale);
     overlay.querySelector('[data-option="blink"]').value=String(blink);
     overlay.querySelector('[data-option="color"]').value=eyeColor;
   }
@@ -333,7 +350,7 @@
     });
   }
   function onSleep() {if(document.hidden)mark(root,'data-fairy-sleep');else {root.removeAttribute('data-fairy-sleep');schedule();}}
-  function onKey(e) { if(e.key === 'Escape') {if(!workspaceMenu.hidden){workspaceMenu.hidden=true;workspace.setAttribute('aria-expanded','false');workspace.focus();}else if(!settings.hidden){settings.hidden = true;control.setAttribute('aria-expanded','false');control.focus();}} }
+  function onKey(e) { if(e.key === 'Escape') {const percent=settings.querySelector('.fairy-percent[open]');if(percent){percent.open=false;percent.querySelector('summary').focus();return;}if(!workspaceMenu.hidden){workspaceMenu.hidden=true;workspace.setAttribute('aria-expanded','false');workspace.focus();}else if(!settings.hidden){settings.hidden = true;control.setAttribute('aria-expanded','false');control.focus();}} }
   function showWorkspaces() {
     const sidebar=document.querySelector('aside.app-shell-left-panel');
     projectTargets=[...sidebar?.querySelectorAll('[data-app-action-sidebar-select-project]')||[]].filter(rendered);
@@ -344,6 +361,7 @@
   }
   function onOutsidePointer(e) {
     const path=e.composedPath();
+    for(const percent of settings.querySelectorAll('.fairy-percent[open]'))if(!path.includes(percent))percent.open=false;
     if(!settings.hidden&&!path.includes(settings)&&!path.includes(control)) {settings.hidden=true;control.setAttribute('aria-expanded','false');}
     if(!workspaceMenu.hidden&&!path.includes(workspaceMenu)&&!path.includes(workspace)) {workspaceMenu.hidden=true;workspace.setAttribute('aria-expanded','false');}
   }
@@ -391,7 +409,7 @@
   document.addEventListener('keydown',onKey);overlay.addEventListener('click',onClick);overlay.addEventListener('change',onChange);
   overlay.addEventListener('input',onInput);
   meter.addEventListener('click',onClick);
-  window[KEY] = {version:'1.3.0',dispose,setUsage,status(){return {enabled:!disposed&&!overlay.hidden,version:'1.3.0',layout:overlay.dataset.layout,busy:overlay.dataset.busy==='true',lowPower,theme};}};
+  window[KEY] = {version:'1.3.0',dispose,setUsage,percentageControl,status(){return {enabled:!disposed&&!overlay.hidden,version:'1.3.0',layout:overlay.dataset.layout,busy:overlay.dataset.busy==='true',lowPower,theme};}};
   refresh();onSleep();
   return window[KEY].status();
 })

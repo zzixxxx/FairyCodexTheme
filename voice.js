@@ -7,8 +7,10 @@
   try{Object.assign(prefs,JSON.parse(localStorage.getItem('fairy-codex-voice-v1')||'{}'));}catch{}
   prefs.engine=prefs.engine==='fairy'?'fairy':'system';prefs.auto=prefs.auto===true;prefs.volume=Math.max(0,Math.min(1,Number.isFinite(Number(prefs.volume))?Number(prefs.volume):.8));
   const panel=document.createElement('section');panel.className='fairy-voice-panel';
-  panel.innerHTML=`<strong>语音朗读</strong><label>语音引擎<select data-voice="engine"><option value="system">系统中文语音</option><option value="fairy">Fairy 本地音色 · GPT-SoVITS</option></select></label><label><input type="checkbox" data-voice="auto"> 自动朗读新回复</label><label>音量<input type="range" min="0" max="1" step="0.05" data-voice="volume" aria-label="朗读音量"></label><div class="fairy-voice-actions"><button type="button" data-speech="read">朗读最新回复</button><button type="button" data-speech="pause" disabled>暂停</button><button type="button" data-speech="stop" disabled>停止</button><button type="button" data-speech="test">试听</button></div><p class="fairy-voice-status" role="status">系统中文语音 · 待机</p><details><summary>Fairy 本地音色配置</summary><p>需自行安装 GPT-SoVITS 和 Fairy 模型，加载模型后填写参考音频及文本。</p><label>服务地址<input data-voice="endpoint" type="url" placeholder="http://127.0.0.1:9880/tts"></label><label>参考音频绝对路径<input data-voice="reference" type="text" placeholder="C:\\Voice\\fairy_ref.wav"></label><label>参考音频对应文本<textarea data-voice="prompt" rows="2"></textarea></label></details>`;
+  panel.innerHTML=`<strong>语音</strong><label>语音引擎<select data-voice="engine"><option value="system">系统中文语音</option><option value="fairy">Fairy 本地音色 · GPT-SoVITS</option></select></label><label><input type="checkbox" data-voice="auto"> 自动朗读新回复</label><div class="fairy-setting-row"><span>音量</span><span data-percent-slot="volume"></span></div><div class="fairy-voice-actions"><button type="button" data-speech="read">朗读最新回复</button><button type="button" data-speech="pause" disabled>暂停</button><button type="button" data-speech="stop" disabled>停止</button><button type="button" data-speech="test">试听</button></div><p class="fairy-voice-status" role="status">系统中文语音 · 待机</p><details><summary>Fairy 本地音色配置</summary><p>需自行安装 GPT-SoVITS 和 Fairy 模型，加载模型后填写参考音频及文本。</p><label>服务地址<input data-voice="endpoint" type="url" placeholder="http://127.0.0.1:9880/tts"></label><label>参考音频绝对路径<input data-voice="reference" type="text" placeholder="C:\\Voice\\fairy_ref.wav"></label><label>参考音频对应文本<textarea data-voice="prompt" rows="2"></textarea></label></details>`;
   settings.append(panel);
+  const volumeControl=window.__FAIRY_CODEX__.percentageControl({label:'音量',min:0,max:1,step:.01,value:prefs.volume,factor:100,attribute:'data-voice',key:'volume'});
+  panel.querySelector('[data-percent-slot="volume"]').replaceWith(volumeControl);
   for(const input of panel.querySelectorAll('[data-voice]')){const value=prefs[input.dataset.voice];if(input.type==='checkbox')input.checked=value;else input.value=String(value);}
   const status=panel.querySelector('.fairy-voice-status'),pauseButton=panel.querySelector('[data-speech="pause"]'),stopButton=panel.querySelector('[data-speech="stop"]');
   let disposed=false,epoch=0,audio=null,objectUrl=null,pending=null,queue=[],paused=false,active=false;
@@ -55,7 +57,7 @@
   }
   function onChange(e){const key=e.target.dataset.voice;if(!key)return;
     if(key==='auto'){prefs.auto=e.target.checked;armed=false;clearTimeout(settle);}
-    else if(key==='volume'){prefs.volume=Number(e.target.value);if(audio)audio.volume=prefs.volume;}
+    else if(key==='volume'){prefs.volume=Math.max(0,Math.min(1,Number(e.target.value)));volumeControl.syncPercent(prefs.volume);if(audio)audio.volume=prefs.volume;}
     else{prefs[key]=e.target.value;stop(prefs.engine==='system'?'系统中文语音 · 待机':'Fairy 本地音色 · 待配置/试听');}
     save();
   }
