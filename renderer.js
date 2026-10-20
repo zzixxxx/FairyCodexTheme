@@ -168,11 +168,22 @@
     const shift=compact?0:(reserve-50)/2;
     const composerStyle=composer?getComputedStyle(composer):null;
     const centeredAbsolute=composerStyle?.position==='absolute'&&composerStyle.transform!=='none';
-    const marginLeft=centeredAbsolute?shift+'px':`calc((100% - ${desiredWidth}px)/2 + ${shift}px)`;
-    const marginRight=centeredAbsolute?'0px':`calc((100% - ${desiredWidth}px)/2 - ${shift}px)`;
-    const widthCss=desiredWidth?`html[data-fairy-codex] [data-fairy-composer]{width:${desiredWidth}px!important;max-width:${desiredWidth}px!important;flex-shrink:0!important;margin-left:${marginLeft}!important;margin-right:${marginRight}!important;${compact?'padding-top:38px!important;':''}}`:'';
+    // Native composers sit in a capped message column whose center can differ
+    // from the chat pane when source/browser panels open. Align in pane space.
+    let offset=centeredAbsolute?0:(parseFloat(composerStyle?.left)||0);
+    const sizing=left=>desiredWidth?`html[data-fairy-codex] [data-fairy-composer]{width:${desiredWidth}px!important;max-width:${desiredWidth}px!important;flex-shrink:0!important;margin-left:${centeredAbsolute?shift:0}px!important;margin-right:0px!important;${centeredAbsolute?'':`position:relative!important;left:${left}px!important;`}${compact?'padding-top:38px!important;':''}}`:'';
+    let widthCss=sizing(offset);
     if(widthStyle.textContent!==widthCss)widthStyle.textContent=widthCss;
     box=composer?.getBoundingClientRect();
+    if(box&&desiredWidth&&!centeredAbsolute) {
+      const target=bounds.left+(compact?12:reserve-25);
+      const next=offset+target-box.left;
+      if(Math.abs(next-offset)>.1) {
+        offset=next;widthCss=sizing(offset);
+        if(widthStyle.textContent!==widthCss)widthStyle.textContent=widthCss;
+        box=composer.getBoundingClientRect();
+      }
+    }
     const room=box?box.left-bounds.left:0;
     const enabled=box&&desiredWidth&&(compact||room>=120)&&box.height<bounds.height*.7;
     const consoleMode=enabled;
