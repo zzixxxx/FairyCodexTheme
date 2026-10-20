@@ -436,3 +436,7 @@ html[data-fairy-codex] [class*="_ApplicationMenuPageSurfaceLayout_"] {background
 /* Keep the panel material, but soften the seam around the conversation surface. */
 html[data-fairy-codex] [class*="_ApplicationMenuTopBar_"] {border-bottom-color:transparent}
 html[data-fairy-codex] [data-fairy-main] {border-radius:10px;box-shadow:0 0 10px #00000012}
+/* Keep Fairy overlays within the chat column beside a browser or review panel. */
+#fairy-codex-overlay .fairy-control {right:calc(var(--fairy-pane-right,0px) + 60px)}
+#fairy-codex-overlay .fairy-day-toggle,#fairy-codex-overlay .fairy-settings {right:calc(var(--fairy-pane-right,0px) + 22px)}
+#fairy-codex-overlay .fairy-settings {width:min(350px,calc(var(--fairy-pane-width,100vw) - 24px))}

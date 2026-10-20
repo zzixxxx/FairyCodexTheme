@@ -119,7 +119,7 @@
     return modeNode?/^Codex$/i.test(modeNode.textContent.trim()):/^codex(?:\s|$)/i.test(document.title);
   }
   function mainNode() { return [...document.querySelectorAll('main.main-surface,main[class*="_MainContentSurface_"],main')].find(rendered); }
-  let watchedMain=null,watchedComposer=null,watchedScroll=null,eyeRect=null,lastUsageSignature=null,missingSince=null;
+  let watchedMain=null,watchedComposer=null,watchedScroll=null,watchedPane=null,eyeRect=null,lastUsageSignature=null,missingSince=null;
   const resize = new ResizeObserver(() => schedule());
   let lastDock='',lastModel=null,lastPermission=null,projectTargets=[];
   function setTheme() {
@@ -222,7 +222,7 @@
       if(performance.now()-missingSince<200){schedule();return;}
     }else missingSince=null;
     if(!codexMode||!main||!sidebar) {
-      resize.disconnect();watchedMain=null;watchedComposer=null;watchedScroll=null;
+      resize.disconnect();watchedMain=null;watchedComposer=null;watchedScroll=null;watchedPane=null;
       lastDock='';lastModel=null;lastPermission=null;
       clearMarkers();overlay.hidden=true;meter.remove();brand.remove();return;
     }
@@ -232,11 +232,17 @@
     const composer = [...main.querySelectorAll('.composer-surface-chrome,[class*="_ComposerLayoutRoot_"]')].find(rendered);
     for(const node of marked.keys()) if(node.hasAttribute('data-fairy-composer') && node!==composer) unmark(node,'data-fairy-composer');
     if (composer) mark(composer, 'data-fairy-composer');
-    if(main!==watchedMain||composer!==watchedComposer) {resize.disconnect();resize.observe(main);if(composer)resize.observe(composer);watchedMain=main;watchedComposer=composer;}
-    const bounds = main.getBoundingClientRect();
+    // A browser/review panel shares the outer main surface. Anchor only to the
+    // conversation focus area, never the combined workspace or the composer width.
+    const scroll=[...main.querySelectorAll('.thread-scroll-container')].find(rendered);
+    const pane=(scroll||composer)?.closest('[data-app-shell-focus-area="main"]')||[...main.querySelectorAll('[data-app-shell-focus-area="main"]')].find(rendered)||main;
+    if(main!==watchedMain||composer!==watchedComposer||pane!==watchedPane) {resize.disconnect();resize.observe(main);if(composer)resize.observe(composer);if(pane!==main)resize.observe(pane);watchedMain=main;watchedComposer=composer;watchedPane=pane;}
+    const mainBounds=main.getBoundingClientRect(),paneBounds=pane.getBoundingClientRect();
+    const left=Math.max(mainBounds.left,paneBounds.left),right=Math.min(mainBounds.right,paneBounds.right);
+    const bounds={left,right,top:mainBounds.top,bottom:mainBounds.bottom,width:Math.max(0,right-left),height:mainBounds.height};
+    setStyle(overlay,'--fairy-pane-right',Math.max(0,innerWidth-right)+'px');setStyle(overlay,'--fairy-pane-width',bounds.width+'px');
     const composerRect = dockControls(composer,composer?.getBoundingClientRect(),bounds);
     // Use message anchors rather than full text reads. Never inspect chat contents.
-    const scroll=[...main.querySelectorAll('.thread-scroll-container')].find(rendered);
     watchedScroll=scroll||null;
     const hasMessages=!!scroll||[...main.querySelectorAll('article,[data-message-author-role],[data-testid*="conversation-turn"],[data-turn-id],[data-fairy-preview-message]')].some(rendered);
     const homeSignals = [...main.querySelectorAll('[data-feature="game-source"],[class~="group/home-suggestions"]')].some(rendered);
@@ -293,7 +299,7 @@
     if(record.type==='attributes') {
       if(record.attributeName==='hidden'||target.matches(structureSelector))return true;
       if(record.attributeName==='aria-label'||record.attributeName==='data-testid')return target===modeNode||!!watchedComposer?.contains(target)||/Stop|停止/.test(target.getAttribute('aria-label')||'');
-      return target===watchedMain||target===watchedComposer||target===watchedScroll||target===watchedScroll?.parentElement||
+      return target===watchedMain||target===watchedComposer||target===watchedPane||target===watchedScroll||target===watchedScroll?.parentElement||
         !!(watchedMain&&target.contains(watchedMain))||!!(watchedComposer&&target.contains(watchedComposer))||target===modeNode;
     }
     if(target===modeNode||modeNode?.contains(target))return true;
