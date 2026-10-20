@@ -28,7 +28,42 @@
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Start-Fairy.ps1
 ```
 
-此执行策略仅作用于该进程，不修改系统执行策略。工具不修改 Codex 安装包、配置文件或开机启动项。
+此执行策略仅作用于该进程，不修改系统执行策略。皮肤启动器不修改 Codex 安装包、配置文件或开机启动项；下述可选插件安装会登记个人插件源和插件启用状态。
+
+## 作为个人插件安装
+
+本目录同时是一个 Codex 个人插件包，包含原生插件清单和两个技能：
+
+- `fairy-codex:fairy-codex`：启用/恢复皮肤、检查环境和只读查询真实用量；语音与眼睛设置继续使用 H.D.D 面板。
+- `fairy-codex:fairy-style`：用户要求时采用 Fairy 式表达，不自动修改所有会话，不冒充完整角色模型或世界观检索。
+
+放入用户目录（建议 `%USERPROFILE%\Tools\Fairy-Codex-Windows`），运行：
+
+~~~powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\Install-PersonalPlugin.ps1
+~~~
+
+脚本合并个人插件源并调用本机 `codex plugin add` 安装，仅增加本插件条目，保留其他插件。安装后刷新插件列表或新开聊天；若界面尚未刷新，保存工作后正常重启应用。可以说“启用 Fairy 皮肤”“查看剩余用量”，或调用上述技能。
+
+插件安装/启用本身不启动皮肤；启动入口仍运行本地伴随程序。皮肤需要回环 CDP 端口；已运行的应用若未开启端口，需先正常退出，再通过 Start-Fairy 启动。停用/卸载插件不会自动关闭已独立运行的皮肤，先运行 Restore-Fairy 可恢复原貌。
+
+官方插件格式参考 [Package your plugin](https://developers.openai.com/plugins/build/plugins)。
+
+## 原项目源码核查与迁移边界
+
+核对上游提交 `d639887a386b0de6fef2e61c97dc268631854591` 的 173 个已跟踪文件：
+
+| 上游模块 | 源码实际入口 | 本包情况 |
+|---|---|---|
+| browser-dock | client.js 注入 shell.overlay，宿主 index.js 注册控制路由 | 不直接加载其 DSH 模块；使用现有 Codex 控件适配 |
+| balance-meter | index.js 监听 session/event，并通过 /balance-meter 返回 DeepSeek 用量/余额 | 改为 Codex 只读限额接口及本机 Token 元数据，不沿用 DeepSeek 现金计费 |
+| fairy-startup | client.js 调用 workspaces.startSession，处理启动会话选择 | 原版“启动时新建会话”未移植，避免改变当前会话 |
+| fairy-voice | lib/index.js 调用本机 9880/tts，local-tts-proxy.js 传递参考音频路径与文本 | 已适配朗读和本地服务接口，默认系统中文语音；不含 Fairy 权重 |
+| fairy-visual | 依赖 window.__ModuleLoader__、ctx.slots 和 DSH settings | 已通过独立本地伴随程序适配，非 Codex 原生主题扩展 API |
+
+源树没有 .ckpt/.pth/.pt/.safetensors/.onnx/.gguf 模型权重，没有 .wav/.mp3/.flac 音频文件，也没有被清单引用的 world-core、runtime/world-knowledge.js、runtime/fairy-cognition.js、runtime/compiler.js、runtime/fairy_core.py。仅有引用并不代表这些实现随仓库分发。
+
+.agent-presets/fairy/agent.cordis.yml 是人格提示配置；style/fairy_voice_model.json 的内容是 registers、principles、profiles 和文字样例，不能加载为音色权重；personality/fairy_world_view.json 是人物认知边界配置，不是完整剧情知识库。ASSET-BOUNDARIES.json 明确列出了这些文件与缺失的运行时/数据之间的预期关系。
 
 ## 功能
 

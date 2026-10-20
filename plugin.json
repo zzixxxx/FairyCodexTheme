@@ -1,0 +1,35 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "fairy-codex",
+  "version": "1.0.0",
+  "description": "Manage the local Fairy Codex theme, speech setup and account usage; optional Fairy response style.",
+  "author": {
+    "name": "zzixxxx"
+  },
+  "repository": "https://github.com/zzixxxx/FairyCodexTheme",
+  "extensions": {
+    "com.openai": {
+      "requires_local_executor": true,
+      "interface": {
+        "displayName": "Fairy Codex",
+        "shortDescription": "Fairy 皮肤、用量与语音管理入口",
+        "longDescription": "个人桌面插件：管理已有 Fairy 皮肤与本地语音、查询真实额度，提供可选 Fairy 表达风格。皮肤依赖本地伴随程序，不含 Fairy 音色权重或完整世界观知识库。",
+        "developerName": "zzixxxx",
+        "category": "Productivity",
+        "capabilities": [
+          "Read",
+          "Write"
+        ],
+        "websiteURL": "https://github.com/zzixxxx/FairyCodexTheme",
+        "defaultPrompt": [
+          "启用 Fairy 皮肤",
+          "恢复 Codex 原貌",
+          "查看 Codex 剩余用量"
+        ],
+        "brandColor": "#4053F0",
+        "composerIcon": "./assets/fairy.png",
+        "logo": "./assets/fairy.png"
+      }
+    }
+  }
+}
