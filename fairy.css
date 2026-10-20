@@ -362,14 +362,6 @@ html[data-fairy-codex][data-fairy-theme="dark"] [data-fairy-main] [class*="_Code
   --codeblock-background-color:#172131!important;--codeblock-syntax-1:#efb278!important;--codeblock-syntax-2:#8cbbff!important;--codeblock-syntax-3:#9ad3ab!important;--codeblock-syntax-4:#e9a2d0!important;--codeblock-syntax-5:#c5acff!important;
   --color-codex-syntax-comment:#96a5b9!important;--color-codex-syntax-keyword:#e9a2d0!important;--color-codex-syntax-string:#9ad3ab!important;--color-codex-syntax-literal:#efb278!important;--color-codex-syntax-name:#8cbbff!important;--color-codex-syntax-variable:#c5acff!important;--color-codex-syntax-attribute:#e1c48a!important;
 }
-/* Preserve Windows' native caption buttons and give dark symbols a readable backing. */
-@media (prefers-color-scheme:light) {
-  html[data-fairy-codex][data-fairy-theme="dark"] [class*="_ApplicationMenuTopBar_"]::after {
-    content:"";position:absolute;right:0;top:0;pointer-events:none;
-    width:calc(100vw - env(titlebar-area-x,0px) - env(titlebar-area-width,calc(100vw - 138px)));
-    height:env(titlebar-area-height,36px);background:#cbd5e1;border-radius:0 0 0 8px;box-shadow:inset 0 -1px #72849b80;
-  }
-}
 /* Keep primary button text paired with its background, including review dialogs. */
 html[data-fairy-codex][data-fairy-theme="dark"],
 html[data-fairy-codex][data-fairy-theme="dark"] body,
@@ -431,3 +423,11 @@ html[data-fairy-theme=light] #fairy-codex-overlay .fairy-voice-panel input:not([
 #fairy-codex-overlay .fairy-settings .fairy-live-status {font-size:12px;line-height:1.5}
 #fairy-codex-overlay .fairy-settings .fairy-voice-status {font-size:13px;line-height:1.5}
 #fairy-codex-overlay {z-index:20}
+
+/* Share the left panel material across the complete Windows title bar. */
+html[data-fairy-codex] {--fairy-sidebar-material:radial-gradient(circle at 2px 3px,#ffffff06 1px,transparent 1.4px) 0 0/7px 9px,linear-gradient(104deg,#41474f,#353b43);--fairy-titlebar-text:#dfe6ef}
+html[data-fairy-codex][data-fairy-theme="light"] {--fairy-sidebar-material:#f7f7f8;--fairy-titlebar-text:#303238}
+html[data-fairy-codex] aside.app-shell-left-panel,
+html[data-fairy-codex] [class*="_ApplicationMenuTopBar_"] {background:var(--fairy-sidebar-material)!important}
+html[data-fairy-codex] [class*="_ApplicationMenuTopBar_"] {color:var(--fairy-titlebar-text)!important;border-bottom:1px solid #87919f40}
+html[data-fairy-codex] [class*="_ApplicationMenuTopBar_"] :is(button,[role=menubar],[role=menuitem]) {color:inherit!important}

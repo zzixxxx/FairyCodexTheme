@@ -1,10 +1,35 @@
 /* Original adaptation; Fairy eye SVG is from Fairy-DSH (Apache-2.0). */
 ((css, eye, options = {}) => {
   const KEY = '__FAIRY_CODEX__';
-  window[KEY]?.dispose();
+  window[KEY]?.dispose({reapply:true});
   let disposed = false, timer = 0, raf = 0, disabled = false;
   const marked = new Map();
   const root = document.documentElement;
+  // Use the same settings route as the host UI; retain the original native theme.
+  // The bridge is optional: offline previews never write application settings.
+  function nativeThemeBridge(){
+    if(options.preview||!location.href.startsWith('app://')||typeof window.electronBridge?.sendMessageFromView!=='function')return null;
+    if(window.__FAIRY_NATIVE_THEME__)return window.__FAIRY_NATIVE_THEME__;
+    let original,desired=null,queue=Promise.resolve(),generation=0;
+    function request(action,params){return new Promise((resolve,reject)=>{
+      const requestId='fairy-native-theme-'+Date.now()+'-'+Math.random().toString(36).slice(2);
+      const clean=()=>{clearTimeout(timeout);window.removeEventListener('message',receive);};
+      const receive=event=>{const value=event.data;if(value?.type!=='fetch-response'||value.requestId!==requestId)return;clean();
+        if(value.responseType!=='success'){reject(Error('Native theme request failed'));return;}
+        try{resolve(JSON.parse(value.bodyJsonString));}catch{reject(Error('Invalid native theme response'));}};
+      window.addEventListener('message',receive);
+      const timeout=setTimeout(()=>{clean();reject(Error('Native theme request timed out'));},2500);
+      try{Promise.resolve(window.electronBridge.sendMessageFromView({type:'fetch',requestId,method:'POST',url:'vscode://codex/'+action,body:JSON.stringify(params)})).catch(error=>{clean();reject(error);});}catch(error){clean();reject(error);}
+    });}
+    const enqueue=action=>{queue=queue.catch(()=>{}).then(action).catch(()=>{});};
+    const api={set(value){if(desired===value)return;desired=value;generation++;
+      enqueue(async()=>{if(original===undefined){const result=await request('get-setting',{key:'appearanceTheme'});if(!['light','dark','system'].includes(result.value))throw Error('Unknown original appearance');original=result.value;}
+        await request('set-setting',{key:'appearanceTheme',value});});},
+      restore(){const ticket=++generation;desired=null;enqueue(async()=>{try{if(original!==undefined&&ticket===generation)await request('set-setting',{key:'appearanceTheme',value:original});}finally{if(ticket===generation&&window.__FAIRY_NATIVE_THEME__===api)delete window.__FAIRY_NATIVE_THEME__;}});}};
+    window.__FAIRY_NATIVE_THEME__=api;return api;
+  }
+  const nativeTheme=nativeThemeBridge();
+
   const style = document.createElement('style');
   style.id = 'fairy-codex-style'; style.textContent = css;
   const dockStyle=document.createElement('style');dockStyle.id='fairy-codex-dock-style';
@@ -100,6 +125,7 @@
   function setTheme() {
     if(overlay.dataset.theme===theme&&root.getAttribute('data-fairy-theme')===theme)return;
     overlay.dataset.theme=theme;
+    nativeTheme?.set(theme);
     const quick=overlay.querySelector('.fairy-day-toggle');
     quick.textContent=theme==='light'?'☾':'☀';quick.setAttribute('aria-label',theme==='light'?'切换到夜间模式':'切换到日间模式');quick.title=quick.getAttribute('aria-label');
     overlay.querySelector('[data-option="theme"]').value=theme;
@@ -331,8 +357,8 @@
     if(e.target.dataset.option === 'speed') {speed=clamp(Number(e.target.value),30,150,70);setStyle(overlay,'--fairy-orbit-duration',`${28*70/speed}s`);}
     save();
   }
-  function dispose() {
-    if(disposed) return; window.__FAIRY_VOICE__?.dispose(); disposed = true; disabled = true;
+  function dispose({reapply=false}={}) {
+    if(disposed) return; if(!reapply)nativeTheme?.restore(); window.__FAIRY_VOICE__?.dispose(); disposed = true; disabled = true;
     observer.disconnect();resize.disconnect();cancelAnimationFrame(timer);cancelAnimationFrame(raf);
     window.removeEventListener('resize',schedule);window.removeEventListener('popstate',schedule);
     document.removeEventListener('pointermove',onMove);document.removeEventListener('visibilitychange',onSleep);
