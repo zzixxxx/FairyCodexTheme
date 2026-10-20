@@ -431,3 +431,8 @@ html[data-fairy-codex] aside.app-shell-left-panel,
 html[data-fairy-codex] [class*="_ApplicationMenuTopBar_"] {background:var(--fairy-sidebar-material)!important}
 html[data-fairy-codex] [class*="_ApplicationMenuTopBar_"] {color:var(--fairy-titlebar-text)!important;border-bottom:1px solid #87919f40}
 html[data-fairy-codex] [class*="_ApplicationMenuTopBar_"] :is(button,[role=menubar],[role=menuitem]) {color:inherit!important}
+/* Paint the native layout's transparent inset without changing resize geometry. */
+html[data-fairy-codex] [class*="_ApplicationMenuPageSurfaceLayout_"] {background:var(--fairy-sidebar-material)!important}
+/* Keep the panel material, but soften the seam around the conversation surface. */
+html[data-fairy-codex] [class*="_ApplicationMenuTopBar_"] {border-bottom-color:transparent}
+html[data-fairy-codex] [data-fairy-main] {border-radius:10px;box-shadow:0 0 10px #00000012}
