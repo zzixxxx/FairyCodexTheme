@@ -51,10 +51,10 @@
   // Shared percentage editor: compact value at rest, slider and exact entry on demand.
   function percentageControl({label,min,max,step=1,value,factor=1,attribute,key}) {
     const host=document.createElement('details');host.className='fairy-percent';
-    host.innerHTML=`<summary aria-label="${label}调节"><output>${Math.round(value*factor)}%</output><span aria-hidden="true">⌄</span></summary><div class="fairy-percent-popover"><input type="range" min="${min}" max="${max}" step="${step}" aria-label="${label}" ${attribute}="${key}"><div class="fairy-percent-entry"><input type="number" min="${min*factor}" max="${max*factor}" step="1" aria-label="${label}百分比"><span>%</span></div></div>`;
+    host.innerHTML=`<summary aria-label="${label}调节"><output>${Math.round(value*factor)}%</output><svg aria-hidden="true" width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="m4.5 6 3.5 3.5L11.5 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></summary><div class="fairy-percent-popover"><input type="range" min="${min}" max="${max}" step="${step}" aria-label="${label}" ${attribute}="${key}"><div class="fairy-percent-entry"><input type="number" min="${min*factor}" max="${max*factor}" step="1" aria-label="${label}百分比"><span>%</span></div></div>`;
     const range=host.querySelector('[type=range]'),number=host.querySelector('[type=number]'),output=host.querySelector('output');
     if(key==='scale')output.dataset.eyeValue='scale';
-    host.syncPercent=value=>{range.value=String(value);number.value=String(Math.round(value*factor));output.textContent=Math.round(value*factor)+'%';};
+    host.syncPercent=value=>{range.style.setProperty('--fairy-percent-fill',((value-min)/(max-min)*100)+'%');range.value=String(value);number.value=String(Math.round(value*factor));output.textContent=Math.round(value*factor)+'%';};
     const commit=()=>{if(number.value==='')return;const value=Math.max(min,Math.min(max,Number(number.value)/factor));host.syncPercent(value);range.dispatchEvent(new Event('input',{bubbles:true}));};
     number.addEventListener('input',()=>{const value=Number(number.value)/factor;if(number.value!==''&&value>=min&&value<=max){range.value=String(value);output.textContent=Math.round(value*factor)+'%';range.dispatchEvent(new Event('input',{bubbles:true}));}});
     number.addEventListener('change',commit);

@@ -8,6 +8,9 @@
   prefs.engine=prefs.engine==='fairy'?'fairy':'system';prefs.auto=prefs.auto===true;prefs.volume=Math.max(0,Math.min(1,Number.isFinite(Number(prefs.volume))?Number(prefs.volume):.8));
   const panel=document.createElement('section');panel.className='fairy-voice-panel';
   panel.innerHTML=`<strong>语音</strong><label>语音引擎<select data-voice="engine"><option value="system">系统中文语音</option><option value="fairy">Fairy 本地音色 · GPT-SoVITS</option></select></label><label><input type="checkbox" data-voice="auto"> 自动朗读新回复</label><div class="fairy-setting-row"><span>音量</span><span data-percent-slot="volume"></span></div><div class="fairy-voice-actions"><button type="button" data-speech="read">朗读最新回复</button><button type="button" data-speech="pause" disabled>暂停</button><button type="button" data-speech="stop" disabled>停止</button><button type="button" data-speech="test">试听</button></div><p class="fairy-voice-status" role="status">系统中文语音 · 待机</p><details><summary>Fairy 本地音色配置</summary><p>需自行安装 GPT-SoVITS 和 Fairy 模型，加载模型后填写参考音频及文本。</p><label>服务地址<input data-voice="endpoint" type="url" placeholder="http://127.0.0.1:9880/tts"></label><label>参考音频绝对路径<input data-voice="reference" type="text" placeholder="C:\\Voice\\fairy_ref.wav"></label><label>参考音频对应文本<textarea data-voice="prompt" rows="2"></textarea></label></details>`;
+  const icons={read:'<path d="M14 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7M8 7h5M8 11h3"/><path d="m16 12 6 4-6 4z"/>',pause:'<path d="M8 5v14M16 5v14"/>',resume:'<path d="m8 5 11 7-11 7z"/>',stop:'<rect x="6" y="6" width="12" height="12" rx="1"/>',test:'<path d="m11 5-6 4H2v6h3l6 4zM15 8a6 6 0 0 1 0 8M18 5a10 10 0 0 1 0 14"/>'};
+  function iconButton(button,label,icon){button.innerHTML=`<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icons[icon]}</svg>`;button.setAttribute('aria-label',label);button.title=label;}
+  for(const [action,label] of Object.entries({read:'朗读最新回复',pause:'暂停',stop:'停止',test:'试听'}))iconButton(panel.querySelector(`[data-speech="${action}"]`),label,action);
   settings.append(panel);
   const volumeControl=window.__FAIRY_CODEX__.percentageControl({label:'音量',min:0,max:1,step:.01,value:prefs.volume,factor:100,attribute:'data-voice',key:'volume'});
   panel.querySelector('[data-percent-slot="volume"]').replaceWith(volumeControl);
@@ -17,7 +20,7 @@
   let route=location.pathname+location.search,container=null,armed=false,settle=0;
   const say=text=>{status.textContent=text;};
   function save(){try{localStorage.setItem('fairy-codex-voice-v1',JSON.stringify(prefs));}catch{}}
-  function update(){pauseButton.disabled=!active;pauseButton.textContent=paused?'继续':'暂停';stopButton.disabled=!active;}
+  function update(){pauseButton.disabled=!active;iconButton(pauseButton,paused?'继续':'暂停',paused?'resume':'pause');stopButton.disabled=!active;}
   function release(){if(audio){audio.onended=null;audio.onerror=null;audio.pause();audio.removeAttribute('src');audio.load();audio=null;}if(objectUrl){URL.revokeObjectURL(objectUrl);objectUrl=null;}}
   function stop(message='已停止'){armed=false;clearTimeout(settle);settle=0;epoch++;active=false;paused=false;queue=[];pending=null;release();try{window.__fairySpeechRequest?.(JSON.stringify({action:'cancel'}));}catch{}say(message);update();}
   // Extract prose only when the user requests speech or a newly finished reply is armed.

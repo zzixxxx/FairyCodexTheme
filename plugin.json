@@ -1,7 +1,7 @@
 {
   "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
   "name": "fairy-codex",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Manage the local Fairy Codex theme, speech setup and account usage; optional Fairy response style.",
   "author": {
     "name": "zzixxxx"

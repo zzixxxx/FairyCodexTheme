@@ -443,7 +443,7 @@ html[data-fairy-codex] [data-fairy-main] {border-radius:10px;box-shadow:0 0 10px
 /* Aligned settings fields with on-demand percentage editing. */
 #fairy-codex-overlay .fairy-settings {--fairy-field-bg:#222b38;--fairy-field-border:#8292ac80;--fairy-field-text:#e0e8f7;--fairy-popover-bg:#303a48}
 #fairy-codex-overlay[data-theme=light] .fairy-settings {--fairy-field-bg:#fff;--fairy-field-border:#bac4d2;--fairy-field-text:#303e52;--fairy-popover-bg:#fff}
-#fairy-codex-overlay .fairy-settings :is(label:not(:has(input[type=checkbox])),.fairy-setting-row) {display:grid;grid-template-columns:minmax(72px,1fr) minmax(0,164px);align-items:center;gap:12px;margin:0;padding:7px 0}
+#fairy-codex-overlay .fairy-settings :is(label:not(:has(input[type=checkbox])),.fairy-setting-row) {display:grid;grid-template-columns:minmax(72px,1fr) minmax(0,128px);align-items:center;gap:12px;margin:0;padding:7px 0}
 #fairy-codex-overlay .fairy-settings :is(select,input[type=color],input[type=url],input[type=text],textarea,.fairy-percent summary) {box-sizing:border-box;width:100%;max-width:none;min-width:0;height:34px;margin:0;padding:5px 9px;border:1px solid var(--fairy-field-border);border-radius:6px;background:var(--fairy-field-bg);color:var(--fairy-field-text)}
 #fairy-codex-overlay .fairy-settings input[type=color] {cursor:pointer;padding:5px}
 #fairy-codex-overlay .fairy-settings textarea {height:70px;resize:vertical}
@@ -464,10 +464,34 @@ html[data-fairy-codex] [data-fairy-main] {border-radius:10px;box-shadow:0 0 10px
 #fairy-codex-overlay .fairy-settings .fairy-percent-entry input[type=number] {box-sizing:border-box;width:56px;min-width:0;height:30px;padding:3px 5px;border:1px solid var(--fairy-field-border);border-radius:5px;background:var(--fairy-field-bg);color:var(--fairy-field-text);appearance:textfield}
 #fairy-codex-overlay .fairy-percent-entry input::-webkit-inner-spin-button {appearance:none}
 #fairy-codex-overlay .fairy-voice-panel {margin-top:14px;padding-top:16px}
-#fairy-codex-overlay .fairy-voice-actions {display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+#fairy-codex-overlay .fairy-voice-actions {display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
 #fairy-codex-overlay .fairy-voice-actions button {width:100%;min-height:34px;margin:0;padding:6px 8px}
 #fairy-codex-overlay .fairy-voice-status {margin:10px 0;color:var(--fairy-field-text);opacity:.8}
 #fairy-codex-overlay .fairy-voice-panel details:not(.fairy-percent) {padding-top:10px;border-top:1px solid var(--fairy-field-border)}
 #fairy-codex-overlay .fairy-voice-panel details:not(.fairy-percent)>summary {cursor:pointer;font-size:13px}
 #fairy-codex-overlay .fairy-settings :is(input,select,textarea,summary,button):focus-visible {outline:2px solid #879cff;outline-offset:2px}
 #fairy-codex-overlay .fairy-percent:not([open])>.fairy-percent-popover {display:none!important}
+
+/* Compact, named speech actions; pause changes to resume while paused. */
+#fairy-codex-overlay .fairy-voice-actions button {display:grid;place-items:center;justify-self:center;width:38px;height:36px;padding:0;background:transparent!important;border-color:transparent!important;box-shadow:none}
+#fairy-codex-overlay .fairy-voice-actions button:not(:disabled):hover {background:var(--fairy-field-bg)!important;border-color:var(--fairy-field-border)!important}
+#fairy-codex-overlay .fairy-voice-actions svg {pointer-events:none}
+
+/* Percentage popover: a custom progress rail and a precise numeric field. */
+#fairy-codex-overlay .fairy-percent summary svg {opacity:.65;transition:transform .15s}
+#fairy-codex-overlay .fairy-percent[open] summary svg {transform:rotate(180deg)}
+#fairy-codex-overlay .fairy-percent[open] summary {border-color:#8298f1;box-shadow:0 0 0 2px #8298f11a}
+#fairy-codex-overlay .fairy-percent-popover {width:216px;padding:13px 12px;gap:12px;border-radius:10px;box-shadow:0 8px 28px #0002;animation:fairy-percent-in .12s ease-out;transform-origin:top right}
+#fairy-codex-overlay .fairy-settings .fairy-percent-popover input[type=range] {appearance:none;height:24px;padding:0;border:0;outline-offset:3px;background:transparent;cursor:pointer;--fairy-slider-track:#536071}
+#fairy-codex-overlay[data-theme=light] .fairy-settings .fairy-percent-popover input[type=range] {--fairy-slider-track:#e2e6ef}
+#fairy-codex-overlay .fairy-percent-popover input[type=range]::-webkit-slider-runnable-track {height:5px;border-radius:8px;background:linear-gradient(90deg,#669ce9,#9290ed) 0/var(--fairy-percent-fill,50%) 100% no-repeat,var(--fairy-slider-track)}
+#fairy-codex-overlay .fairy-percent-popover input[type=range]::-webkit-slider-thumb {appearance:none;width:15px;height:15px;margin-top:-5px;border-radius:50%;border:3px solid #fff;background:#838de7;box-shadow:0 1px 5px #26386c55;transition:box-shadow .15s,transform .15s}
+#fairy-codex-overlay .fairy-percent-popover input[type=range]:hover::-webkit-slider-thumb {box-shadow:0 0 0 4px #8d96f026,0 1px 5px #26386c44}
+#fairy-codex-overlay .fairy-percent-popover input[type=range]:active::-webkit-slider-thumb {transform:scale(1.12);box-shadow:0 0 0 5px #8d96f033}
+#fairy-codex-overlay .fairy-percent-entry {gap:0;overflow:hidden;border:1px solid var(--fairy-field-border);border-radius:6px;background:var(--fairy-field-bg)}
+#fairy-codex-overlay .fairy-settings .fairy-percent-entry input[type=number] {width:43px;border:0;border-radius:0;padding:3px 0 3px 6px;text-align:center;background:transparent}
+#fairy-codex-overlay .fairy-percent-entry>span {padding-right:7px;font-size:12px;opacity:.65}
+#fairy-codex-overlay .fairy-percent-entry:focus-within {outline:2px solid #879cff;outline-offset:2px}
+#fairy-codex-overlay .fairy-percent-entry input:focus-visible {outline:none}
+@keyframes fairy-percent-in {from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){#fairy-codex-overlay .fairy-percent-popover {animation:none}}
